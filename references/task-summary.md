@@ -4,9 +4,11 @@ Opt-in, local, per-task outcome summaries. Default off: nothing is written unles
 
 ## Location (outside the public repo)
 
-`${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml`
+The user's explicit destination and permitted write boundary take precedence over any default. Before creating a directory or file, inspect the current `XDG_DATA_HOME` and `HOME`, resolve the proposed path, and verify it is within the authorized boundary. If the default is outside that boundary, do not write there; use an explicitly authorized suitable location or ask for one. Never substitute the literal home-directory default when `XDG_DATA_HOME` is set.
 
-One YAML file per task, based on `templates/task-summary.yaml`. Never write summaries into a project repository, the factory plugin repository, or any synced location. Create the directory with `0700` permissions and files with `0600`.
+When no narrower destination or boundary applies, the default is `${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml`.
+
+One YAML file per task, based on `../templates/task-summary.yaml` relative to this reference. By default keep summaries outside project repositories and synced locations; if the user explicitly chooses a different location, respect their scope and privacy preferences. Create the directory with `0700` permissions and files with `0600`.
 
 ## Opt-in and opt-out
 
@@ -27,7 +29,7 @@ Do not store credentials, full prompts, private diffs, unrelated transcripts, or
 ## Retention and deletion
 
 - Retention: files persist until the user deletes them. No automatic expiry, rotation, upload, or cross-machine sync is performed or claimed for v1.
-- Deletion: delete individual files, or the whole `ega-factory/summaries/` directory to remove all recorded data. No other copy or cache is created, so deleting the files deletes the data. If asked to delete, remove exactly what was identified and report what was removed.
+- Deletion: delete individual files, or the whole `ega-factory/summaries/` directory if explicitly requested. Other copies, backups or caches may exist. If asked to delete, remove exactly what was identified and report what was removed.
 
 ## Limits
 
