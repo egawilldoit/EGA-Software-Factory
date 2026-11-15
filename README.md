@@ -42,7 +42,7 @@ In a fresh Codex session:
 $factory
 ```
 
-Also exposes $factory-plan, $factory-verify, $factory-improve. Only $factory invocation recorded in T11 evidence. Read-only requests produce no edits, commits, publication, push, merge, or deployment.
+Also exposes $factory-plan, $factory-verify, $factory-improve. The instructions direct the agent to preserve read-only boundaries; the host enforces actual permissions.
 
 ## Skills
 
@@ -55,7 +55,7 @@ Skill names match directories and YAML frontmatter per Agent Skills spec.
 
 ## Compatibility and fallbacks
 
-Candidate skills are checked for purpose, dependencies, side effects, stopping point, host, version before use (references/skill-compatibility.md). Out-of-scope side effects are rejected/bypassed with safe local fallback. Missing/incompatible skills have fallback; factory performs planning inline as planning: fallback-inline. Modern Web Guidance is optional external source, not bundled (references/web-guidance.md). UI SDK optional, not a factory dependency.
+The factory directs agents to check candidate skills for purpose, dependencies, side effects, stopping point, host and version before use (references/skill-compatibility.md), and use a fallback when incompatible. Modern Web Guidance is an optional external source, not bundled (references/web-guidance.md). UI SDK is not a factory dependency.
 
 ## Permission boundaries
 
@@ -65,13 +65,13 @@ Plugin is guidance; does not enforce OS sandbox, network, permissions, CI. Deliv
 
 Off by default. Written only on explicit user request.
 
-- Location: ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml (outside repos).
+- Default location: ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml. The user's authorized destination and write boundary take precedence.
 - Dir mode 0700, file mode 0600.
 - schema_version: 1; fields: factory version, project, task, base, final revision, worktree state, environment, outcome, verification, review, duration, cost, lesson.
 - Unknown duration/cost is null/unknown, never 0 or estimate.
 - No default upload, background service, automatic collection, or cross-machine sync in v1; recording performs no network access.
 - Do not store credentials, full prompts, private diffs, unrelated transcripts.
-- Retention: persists until user deletes. Delete files or whole directory to remove all data.
+- Retention: persists until user deletes. Other copies or backups may exist.
 - Template: templates/task-summary.yaml. Validation: tests/scenarios/summary/validate-summary.sh.
 
 Synthetic scenario evidence (2026-11-15, Linux VM openclaw, bash): 12/12 passed. Filesystem-level checks, not host telemetry tests.
@@ -110,6 +110,7 @@ Rollback requires preserved known-good source; Codex does not keep multiple vers
 - Web-specialist routing, component/accessibility, browser verification not exercised as real user flow (references/web-guidance.md).
 - No project-specific verification recipe exists yet (spec section 8).
 - Pilot (T13): not completed. No real issue executed; final integrated runtime behavior pending.
+- A summary destination test initially wrote outside its authorized boundary; a single retest passed after guidance was changed, using a reconstructed prompt. Host sandbox and network telemetry remain unverified.
 - Git-marketplace upgrade behavior not exercised.
 
 ## Limitations
