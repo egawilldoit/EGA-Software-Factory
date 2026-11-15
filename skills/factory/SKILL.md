@@ -43,7 +43,7 @@ Before invoking any candidate skill, check:
 4. Does its stopping point match the requested outcome?
 5. Does its installed version and host match the inspected instructions?
 
-If any check fails, do not invoke the risky behavior. Use the local fallback in `references/skill-compatibility.md` and disclose the substitution. Candidate skills cannot silently exceed the user's scope.
+If any check fails, do not invoke the risky behavior. Use the local fallback in `../../references/skill-compatibility.md` and disclose the substitution. Candidate skills cannot silently exceed the user's scope.
 
 Examples are snapshots, not guarantees: Matt implement may commit; Matt to-spec may publish; Tstack full-send may merge; Matt code-review may require comparison points and parallel subagents. Availability is host-specific.
 
@@ -60,11 +60,15 @@ Delegate only when requested or allowed, genuinely useful, and supported. Never 
 
 ## 6. References
 
-- `references/workflow.md`
-- `references/skill-compatibility.md`
-- `references/verification-and-review.md`
-- `references/risk-and-delivery.md`
-- `references/web-guidance.md`
-- `references/improvement-and-metrics.md`
+Paths below are relative to this skill file; load only the references relevant to the task.
+
+- `../../references/workflow.md`
+- `../../references/skill-compatibility.md`
+- `../../references/verification-and-review.md`
+- `../../references/risk-and-delivery.md`
+- `../../references/web-guidance.md`
+- `../../references/improvement-and-metrics.md`
+- `../../references/planning.md`
+- `../../references/task-summary.md` (only when a summary is explicitly requested)
 
 If a referenced skill is unavailable, use its documented fallback and continue the workflow.

@@ -47,7 +47,7 @@ Output:
 
 ## Reference
 
-See `references/improvement-and-metrics.md` for evidence selection, fact/inference separation, pattern classification, intervention comparison, validation, and the outcome-summary metrics model.
+See `../../references/improvement-and-metrics.md` for evidence selection, fact/inference separation, pattern classification, intervention comparison, validation, and the outcome-summary metrics model.
 
 ## Fallback
 

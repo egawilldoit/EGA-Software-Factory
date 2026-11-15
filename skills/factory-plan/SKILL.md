@@ -40,6 +40,6 @@ When the skill cannot be invoked, return a compact plan with the same sections a
 
 ## References
 
-- `references/planning.md`
-- `references/risk-and-delivery.md`
-- `references/verification-and-review.md`
+- `../../references/planning.md`
+- `../../references/risk-and-delivery.md`
+- `../../references/verification-and-review.md`
