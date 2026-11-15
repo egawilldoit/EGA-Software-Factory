@@ -1,0 +1,14 @@
+{
+  "name": "ega-software-factory",
+  "version": "0.2.0",
+  "description": "Version B fixture for T11 refresh/rollback testing.",
+  "author": { "name": "EGAWILLDOIT" },
+  "license": "TBD",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "EGA Software Factory",
+    "shortDescription": "Route software work to factory workflows",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"]
+  }
+}

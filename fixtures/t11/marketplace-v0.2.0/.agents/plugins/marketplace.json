@@ -1,0 +1,12 @@
+{
+  "name": "ega-software-factory",
+  "interface": { "displayName": "EGA Software Factory" },
+  "plugins": [
+    {
+      "name": "ega-software-factory",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}
