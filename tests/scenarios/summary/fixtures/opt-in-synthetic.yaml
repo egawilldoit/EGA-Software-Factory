@@ -1,0 +1,15 @@
+# Synthetic opt-in task summary. Contains no real task, cost, or secret data.
+schema_version: 1
+factory_version: "ega-software-factory@0.1.0+t09-synthetic"
+project: "synthetic-fixture"
+task: "synthetic T09 opt-in scenario (no real task data)"
+base: "unknown"
+final_revision: "unknown"
+worktree_state: "dirty"
+environment: "synthetic: bash on linux VM; no real task run"
+outcome: "completed"
+verification: "synthetic: local validator checks passed (no real checks run)"
+review: "same-agent (synthetic only)"
+duration: null
+cost: null
+lesson: "no improvement justified"

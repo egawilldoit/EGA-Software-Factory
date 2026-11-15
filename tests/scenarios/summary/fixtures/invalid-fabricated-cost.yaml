@@ -1,0 +1,15 @@
+# NEGATIVE fixture: must fail validation. Cost 0 without a measured source
+# is a fabricated metric; unknown cost must be null instead.
+schema_version: 1
+factory_version: "ega-software-factory@0.1.0+t09-synthetic"
+project: "synthetic-fixture"
+task: "synthetic fabricated-metric rejection scenario"
+base: "unknown"
+final_revision: "unknown"
+worktree_state: "clean"
+environment: "synthetic: bash on linux VM; no real task run"
+outcome: "completed"
+verification: "synthetic: negative fixture for validator rejection"
+review: "same-agent (synthetic only)"
+duration: null
+cost: 0

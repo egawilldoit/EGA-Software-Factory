@@ -1,0 +1,21 @@
+# EGA Software Factory — opt-in local task summary (schema_version 1)
+# Copy to the summary directory and fill in real values, one file per task:
+#   ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml
+# Write only when the user explicitly opts in. See references/task-summary.md.
+# Rules: unknown -> null or "unknown", never zero or an estimate.
+#        no credentials, full prompts, private diffs, or transcripts.
+
+schema_version: 1
+factory_version: "REPLACE_factory_version"
+project: "REPLACE_project"
+task: "REPLACE_task"
+base: "REPLACE_base"
+final_revision: "REPLACE_final_revision"
+worktree_state: "REPLACE_worktree_state"
+environment: "REPLACE_environment"
+outcome: "REPLACE_outcome"
+verification: "REPLACE_verification"
+review: "REPLACE_review"
+duration: null
+cost: null
+lesson: "REPLACE_lesson_or_remove"
