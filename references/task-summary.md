@@ -4,7 +4,7 @@ Opt-in, local, per-task outcome summaries. Default off: nothing is written unles
 
 ## Location (outside the public repo)
 
-The user's explicit destination and permitted write boundary take precedence over any default. Before creating a directory or file, inspect the current `XDG_DATA_HOME` and `HOME`, resolve the proposed path, and verify it is within the authorized boundary. If the default is outside that boundary, do not write there; use an explicitly authorized suitable location or ask for one. Never substitute the literal home-directory default when `XDG_DATA_HOME` is set.
+The user's explicit destination and permitted write boundary take precedence over any default. Before creating a directory or file, inspect the current `XDG_DATA_HOME` and `HOME`. A nonempty absolute `XDG_DATA_HOME` takes precedence over `HOME`; if it is unset or empty, use `HOME/.local/share`. Do not interpret a relative `XDG_DATA_HOME` or a missing `HOME` as a usable default. Resolve the destination and authorized boundary to absolute canonical paths, including existing symlinks, and check containment by path components, not a string prefix. Resolve and check again immediately before writing. If the path cannot be resolved or lies outside the authorized boundary, do not write there; use an explicitly authorized suitable location or ask for one. Never substitute the literal home-directory default when `XDG_DATA_HOME` is set. These instructions do not enforce filesystem isolation; host permissions and sandbox controls remain responsible for enforcement.
 
 When no narrower destination or boundary applies, the default is `${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml`.
 

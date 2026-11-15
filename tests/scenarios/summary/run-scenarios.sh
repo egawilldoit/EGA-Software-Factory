@@ -6,7 +6,11 @@
 set -u
 here="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$here/../../.." && pwd)"
-data_root="${TMPDIR:-/tmp}/ega-factory-t09-$$"
+data_root="$(mktemp -d "${TMPDIR:-/tmp}/ega-factory-t09-XXXXXX")"
+export HOME="$data_root/home"
+unset XDG_DATA_HOME
+mkdir -p "$HOME/.local/share/ega-factory/summaries"
+printf 'existing synthetic summary\n' > "$HOME/.local/share/ega-factory/summaries/existing.yaml"
 summaries="$data_root/summaries"
 mkdir -p "$summaries"
 trap 'rm -rf "$data_root"' EXIT
@@ -42,18 +46,14 @@ case "$(cd "$summaries" && pwd -P)" in "$repo_root"/*) check 1 "S1b summary writ
 [ "$(stat -c '%a' "$summary")" = "600" ] && [ "$(stat -c '%a' "$summaries")" = "700" ]
 check $? "S1c summary file/dir permissions are 600/700"
 
-# --- S2: default/opt-out writes nothing anywhere ---
+# --- S2: opt-out leaves existing isolated-home data intact ---
 optout_root="$data_root/opt-out-workspace"
 mkdir -p "$optout_root/repo"
 [ "$(find "$optout_root" -name '*.yaml' 2>/dev/null | wc -l)" -eq 0 ]
 check $? "S2a opt-out: no summary file created in the workspace"
 default_dir="${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries"
-if [ -e "$default_dir" ]; then
-  [ "$(find "$default_dir" -name '*.yaml' 2>/dev/null | wc -l)" -eq 0 ]
-  check $? "S2b default summary location is empty (clean-machine assumption)"
-else
-  check 0 "S2b default summary location does not exist (nothing was ever written)"
-fi
+[ "$(find "$default_dir" -type f | wc -l)" -eq 1 ] && [ "$(cat "$default_dir/existing.yaml")" = 'existing synthetic summary' ]
+check $? "S2b existing isolated-home summary preserved"
 
 # --- S3: unknown metrics are null, never zero or an estimate ---
 bash "$here/validate-summary.sh" "$here/fixtures/opt-in-synthetic.yaml" >/dev/null 2>&1
@@ -74,6 +74,15 @@ else
 fi
 ! grep -Eqi '^[[:space:]]*(api[_-]?key|password|secret|token|authorization|prompt|transcript|trace|conversation|messages|full[-_]?log):' "$summary"
 check $? "S4b opt-in summary contains no secret or transcript-like fields"
+if bash "$here/validate-summary.sh" "$here/fixtures/invalid-credential-pattern.yaml" >"$data_root/credential.out" 2>&1; then
+  check 1 "S4c credential pattern in an allowed field is rejected"
+else
+  grep -q 'credential-like pattern found' "$data_root/credential.out"
+  check $? "S4c credential pattern in an allowed field is rejected"
+fi
+
+python3 "$here/test-destinations.py"
+check $? "destination precedence and boundary checks"
 
 # --- S5: network observation limits ---
 # Limited observation: this can only show that the test scripts contain no

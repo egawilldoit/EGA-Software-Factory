@@ -91,13 +91,14 @@ json_list() { # items -> ["a","b"]
 
 write_report() { # status
   local status="$1"
-  local performed_json refused_json unverified_json
+  local performed_json refused_json unverified_json final_rev
+  final_rev="$(git -C "$REPO" rev-parse HEAD)" || return 1
   performed_json="$(json_list "${performed[@]}")"
   refused_json="$(json_list "${refused[@]}")"
   unverified_json="$(json_list "${unverified[@]}")"
   [ -n "$REPORT" ] || return 0
-  printf '{"schema":"t10-delivery-report/1","mock_host":true,"status":"%s","boundary":"%s","provider":"%s","base_revision":"%s","branch":"%s","dirty_files":%s,"performed":%s,"refused":%s,"unverified":%s}\n' \
-    "$status" "$BOUNDARY" "$provider" "$base_rev" "$branch" "${dirty_files:-0}" \
+  printf '{"schema":"t10-delivery-report/1","mock_host":true,"status":"%s","boundary":"%s","provider":"%s","base_revision":"%s","final_revision":"%s","branch":"%s","dirty_files":%s,"performed":%s,"refused":%s,"unverified":%s}\n' \
+    "$status" "$BOUNDARY" "$provider" "$base_rev" "$final_rev" "$branch" "${dirty_files:-0}" \
     "$performed_json" "$refused_json" "$unverified_json" > "$REPORT"
 }
 
@@ -114,7 +115,7 @@ case "$BOUNDARY" in
       if git -C "$REPO" diff --cached --quiet; then
         echo "no staged changes; local commit skipped (nothing authorized to commit)"
       else
-        git -C "$REPO" commit -m "$COMMIT_MSG" --quiet
+        git -C "$REPO" commit -m "$COMMIT_MSG" --quiet || refuse "local commit failed"
         performed+=("local-commit:$(git -C "$REPO" rev-parse --short HEAD)")
       fi
     fi

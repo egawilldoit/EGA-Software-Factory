@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Version A fixture for T11 refresh/rollback testing.",
   "author": { "name": "EGAWILLDOIT" },
-  "license": "TBD",
   "skills": "./skills/",
   "interface": {
     "displayName": "EGA Software Factory",
