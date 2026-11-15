@@ -18,14 +18,11 @@ This document covers **plugin package updates and rollback only**. It is separat
 
 ## Isolated testing rule
 
-Use an isolated `CODEX_HOME` and temporary marketplace so the real user configuration is not changed:
+Use a newly created isolated `CODEX_HOME` and temporary marketplace so the real user configuration is not changed. Authentication may be needed for an invocation; use the host's supported authentication method and protect any credentials. The install and list checks do not establish that a fresh home can invoke a model without authentication.
 
 ```sh
-rm -rf /tmp/opencode/codexhome-t11
-mkdir -p /tmp/opencode/codexhome-t11
-cp /home/ubuntu/.codex/config.toml /tmp/opencode/codexhome-t11/config.toml
-cp /home/ubuntu/.codex/auth.json /tmp/opencode/codexhome-t11/auth.json
-chmod 600 /tmp/opencode/codexhome-t11/auth.json
+CODEX_HOME="$(mktemp -d)"
+export CODEX_HOME
 ```
 
 ## Refresh workflow
@@ -33,15 +30,13 @@ chmod 600 /tmp/opencode/codexhome-t11/auth.json
 1. Add a marketplace pointing at a version-A source:
 
    ```sh
-   CODEX_HOME=/tmp/opencode/codexhome-t11 \
-     codex plugin marketplace add /path/to/marketplace-v0.1.0 --json
+   codex plugin marketplace add /path/to/marketplace-v0.1.0 --json
    ```
 
 2. Install version A:
 
    ```sh
-   CODEX_HOME=/tmp/opencode/codexhome-t11 \
-     codex plugin add ega-software-factory@ega-software-factory --json
+   codex plugin add ega-software-factory@ega-software-factory --json
    ```
 
    Observed: installed path `.../ega-software-factory/0.1.0`, `codex plugin list` reports `0.1.0`.
@@ -51,8 +46,7 @@ chmod 600 /tmp/opencode/codexhome-t11/auth.json
 4. Refresh by reinstalling from the same marketplace:
 
    ```sh
-   CODEX_HOME=/tmp/opencode/codexhome-t11 \
-     codex plugin add ega-software-factory@ega-software-factory --json
+   codex plugin add ega-software-factory@ega-software-factory --json
    ```
 
    Observed: installed path switches to `.../ega-software-factory/0.2.0`; the old `0.1.0` cache directory is removed; `codex plugin list` reports `0.2.0`.
@@ -72,8 +66,7 @@ To return to a known-good version:
 2. Reinstall:
 
    ```sh
-   CODEX_HOME=/tmp/opencode/codexhome-t11 \
-     codex plugin add ega-software-factory@ega-software-factory --json
+   codex plugin add ega-software-factory@ega-software-factory --json
    ```
 
    Observed: installed path returns to `.../ega-software-factory/0.1.0`; `codex plugin list` reports `0.1.0`; the `0.2.0` cache directory is removed.
@@ -81,10 +74,8 @@ To return to a known-good version:
 Alternative, fully remove then reinstall:
 
 ```sh
-CODEX_HOME=/tmp/opencode/codexhome-t11 \
-  codex plugin remove ega-software-factory@ega-software-factory --json
-CODEX_HOME=/tmp/opencode/codexhome-t11 \
-  codex plugin marketplace remove ega-software-factory
+codex plugin remove ega-software-factory@ega-software-factory --json
+codex plugin marketplace remove ega-software-factory
 # add preserved known-good marketplace, then install
 ```
 
