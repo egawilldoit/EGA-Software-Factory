@@ -6,7 +6,6 @@
     "name": "EGAWILLDOIT"
   },
   "homepage": "https://github.com/egawilldoit/EGA-Software-Factory",
-  "license": "TBD",
   "skills": "./skills/",
   "interface": {
     "displayName": "EGA Software Factory",
