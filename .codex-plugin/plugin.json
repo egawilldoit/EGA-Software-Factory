@@ -1,0 +1,25 @@
+{
+  "name": "ega-software-factory",
+  "version": "0.1.0",
+  "description": "Thin Codex plugin that routes software work to factory workflows with proportional planning, verification, review, and improvement.",
+  "author": {
+    "name": "EGAWILLDOIT"
+  },
+  "homepage": "https://github.com/egawilldoit/EGA-Software-Factory",
+  "license": "TBD",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "EGA Software Factory",
+    "shortDescription": "Route software work to factory workflows",
+    "longDescription": "A small Codex plugin with a factory entry point. Full orchestrator, planning, verification, and improvement skills are added in later tasks.",
+    "developerName": "EGAWILLDOIT",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use $factory to assess this repository and route the work proportionately"
+    ]
+  }
+}
