@@ -1,11 +1,12 @@
-# EGA Software Factory — opt-in local task summary (schema_version 1)
+# EGA Software Factory — opt-in local task report (schema_version 2)
 # Copy to the summary directory and fill in real values, one file per task:
-#   ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml
-# Write only when the user explicitly opts in. See references/task-summary.md.
+#   ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<UTC-timestamp>-<short-task>-<unique-suffix>.yaml
+# Write on task opt-in or enabled project reporting. See references/task-summary.md.
 # Rules: unknown -> null or "unknown", never zero or an estimate.
 #        no credentials, full prompts, private diffs, or transcripts.
 
-schema_version: 1
+schema_version: 2
+recorded_at: "REPLACE_UTC_timestamp"
 factory_version: "REPLACE_factory_version"
 project: "REPLACE_project"
 task: "REPLACE_task"
@@ -16,6 +17,23 @@ environment: "REPLACE_environment"
 outcome: "REPLACE_outcome"
 verification: "REPLACE_verification"
 review: "REPLACE_review"
+links:
+  task: null
+  thread: null
+  pr: null
+# Add one row per relevant check, including checks skipped or unavailable.
+checks: []
+# Example row: {name: "focused tests", status: "passed", evidence: "revision and result"}
+review_detail:
+  independence: unknown
+  evidence: "unknown"
+delivery:
+  merged: unknown
+  deployed: unknown
+  verified_live: unknown
+  evidence: "unknown"
+blockers: []
+rework: []
 duration: null
 cost: null
 lesson: "REPLACE_lesson_or_remove"

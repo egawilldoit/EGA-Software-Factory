@@ -11,7 +11,7 @@ Improve the factory only from selected, authorized evidence. An improvement is a
 
 Input: selected evidence explicitly chosen by the user or by a prior authorized step (outcome summaries, failing check logs, review notes, incident notes), the factory/plugin version and revision, access boundaries, and the question to answer.
 
-Evidence is never collected automatically. Full session transcripts, prompts, secrets, and unrelated records are out of scope unless specifically authorized and necessary.
+Reports may be written at handoff under standing project opt-in, as described in `../../references/task-summary.md`. Select reports by project/date and include blocked outcomes; missing reports mean unknown coverage. Check underlying evidence before treating a report's explanation as an established cause. Evidence is never bulk-collected automatically. Full session transcripts, prompts, secrets, and unrelated records are out of scope unless specifically authorized and necessary.
 
 Output:
 - Evidence inventory: source, date, revision, access basis, and gaps.

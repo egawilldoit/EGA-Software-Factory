@@ -42,6 +42,7 @@ The parent supplies one generated JSON file; the worker contains no workflow tex
 - `defaultVersion`: must equal `releases[0].version`; that release is "current".
 - `releases`: non-empty; `releases[1]` (when present) is "previous"; any others are archived but still retrievable by exact version.
 - Each release must be self-contained: all items it serves are inside that release. The worker never merges items across releases. A pinned `version` argument reads only that release.
+- The allowlist is global across releases, but a release contains only the assets that existed when it was published. An allowlisted id absent from a pinned older release returns `ID_NOT_IN_RELEASE`; the worker never substitutes current content. The adapter maps only paths present in each immutable package, so newly added assets are not mandatory in older releases.
 - First release: emit only the current release. Do not invent a previous release. Add the previous immutable release only when an actual prior release exists.
 - `version`, `sourceCommit`, `releasedAt`: non-empty strings. `sourceCommit` is the source commit of that release, not a deployment id.
 - `items[].kind`: one of `skill`, `reference`, `doc`, `template`. `doc` covers the two files linked from references as `../docs/*.md`; resolve those links into `doc:` ids so retrieval is possible.
@@ -55,9 +56,9 @@ The parent supplies one generated JSON file; the worker contains no workflow tex
 | kind | ids |
 | --- | --- |
 | skill | `factory`, `factory-plan`, `factory-verify`, `factory-improve` |
-| reference | `reference:workflow`, `reference:skill-compatibility`, `reference:verification-and-review`, `reference:risk-and-delivery`, `reference:pr-workflows`, `reference:takeover-and-modernize`, `reference:web-guidance`, `reference:improvement-and-metrics`, `reference:planning`, `reference:synchronization`, `reference:task-summary` |
+| reference | `reference:workflow`, `reference:skill-compatibility`, `reference:verification-and-review`, `reference:risk-and-delivery`, `reference:pr-workflows`, `reference:takeover-and-modernize`, `reference:web-guidance`, `reference:improvement-and-metrics`, `reference:planning`, `reference:issue-drafting`, `reference:synchronization`, `reference:task-summary` |
 | doc | `doc:authorization-and-completion-scenarios`, `doc:v4-acceptance-status` |
-| template | `template:task-summary` |
+| template | `template:task-summary`, `template:implementation-issue` |
 
 Four references link to both docs: `verification-and-review`, `risk-and-delivery`, `pr-workflows`, `takeover-and-modernize`.
 

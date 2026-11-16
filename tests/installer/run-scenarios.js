@@ -91,7 +91,9 @@ check('packed tarball contains CLI, descriptor and canonical content', () => {
     'bundle/bundle.json', 'bundle/files/skills/factory/SKILL.md',
     'bundle/files/skills/factory-plan/SKILL.md',
     'bundle/files/references/workflow.md',
+    'bundle/files/references/issue-drafting.md',
     'bundle/files/templates/task-summary.yaml',
+    'bundle/files/templates/implementation-issue.md',
     'bundle/files/docs/v4-acceptance-status.md',
   ]) ok(packFiles.includes(p), 'missing from tarball: ' + p);
 });
@@ -146,7 +148,7 @@ function writeLock(home, pid) {
 }
 
 const SKILLS = ['factory', 'factory-plan', 'factory-verify', 'factory-improve'];
-const REFS = ['improvement-and-metrics', 'planning', 'pr-workflows', 'risk-and-delivery', 'skill-compatibility',
+const REFS = ['improvement-and-metrics', 'issue-drafting', 'planning', 'pr-workflows', 'risk-and-delivery', 'skill-compatibility',
   'synchronization', 'takeover-and-modernize', 'task-summary', 'verification-and-review', 'web-guidance', 'workflow'];
 
 // ---------------------------------------------------------------------------
@@ -165,6 +167,7 @@ check('install lays out complete self-contained bundle; doctor is clean', () => 
   for (const s of SKILLS) ok(fs.existsSync(installed(home, `skills/${s}/SKILL.md`)), 'missing skill ' + s);
   for (const r of REFS) ok(fs.existsSync(installed(home, `references/${r}.md`)), 'missing reference ' + r);
   ok(fs.existsSync(installed(home, 'templates/task-summary.yaml')), 'missing template');
+  ok(fs.existsSync(installed(home, 'templates/implementation-issue.md')), 'missing issue template');
   ok(fs.existsSync(installed(home, 'docs/authorization-and-completion-scenarios.md')), 'missing authorization doc');
   ok(fs.existsSync(installed(home, 'docs/v4-acceptance-status.md')), 'missing status doc');
   eq(manifestOf(home).version, BASE_VERSION, 'manifest version');

@@ -1,6 +1,6 @@
 # Planning
 
-factory-plan resolves consequential uncertainty into the smallest useful plan for the requested risk. Planning is not a universal approval gate and never creates issues, commits, branches, or other external writes by itself.
+factory-plan resolves consequential uncertainty into the smallest useful plan for the requested risk. It also drafts issues from ideas and bugs. Planning is not a universal approval gate and never creates issues, commits, branches, or other external writes by itself: issue drafting produces local text by default and publishes only when the user explicitly requests publication in an identified repository. See [issue-drafting.md](issue-drafting.md).
 
 ## Proportionality
 
@@ -58,13 +58,16 @@ Failure cases should include at least one permission bypass, one malformed or mi
 
 ## Consequential questions
 
-Ask only when the answer changes scope, risk, authorization, or an externally visible contract and cannot be inferred from repository evidence. Resolve routine choices autonomously and record the assumption. Never use planning as a way to defer an obvious decision.
+Ask only when the answer changes scope, risk, authorization, or an externally visible contract and cannot be inferred from repository evidence. Batch independent consequential questions and defer dependent ones; research factual answers instead of asking for them. Resolve routine choices autonomously and record the assumption. Never use planning as a way to defer an obvious decision.
 
 ## Side effects and external writes
 
-- A plan is a local artifact. It does not create tracker issues, commits, branches, PRs, comments, deployments, or configuration changes.
+- A plan or issue draft is a local artifact by default. It does not create tracker issues, commits, branches, PRs, comments, deployments, or configuration changes.
+- An explicit issue-publication request authorizes only the requested issues and necessary dependency references in the identified repository. It does not authorize coding, closure of other issues, labels beyond existing project rules, commits, PRs or deployment. Publication ends planning.
+- Honor read-only/no-write boundaries, including their precedence over standing outcome-report permission. A "draft" instruction never implies permission to write local files.
 - If the user asks for delivery, hand off to the delivery workflow at the exact authorized boundary.
 - Do not introduce a mandatory human approval step; the user's requested stopping point and authorization define when to proceed.
+- Report partial publication honestly: keep created IDs, check for duplicates before retrying, and do not recreate the whole set or broaden permissions to repair a failure.
 
 ## Comparison: small fix vs high-impact change
 

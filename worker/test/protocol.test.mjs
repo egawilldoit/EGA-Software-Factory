@@ -8,6 +8,7 @@ const bundle = JSON.parse(
 );
 const index = createGuidanceIndex(bundle);
 const handler = createMcpHandler({ index });
+const NEW_IDS = ['reference:issue-drafting', 'template:implementation-issue'];
 
 // Test-only two-release bundle used to verify pinned retrieval and rollback.
 // It is never deployed and is not public release content.
@@ -20,10 +21,14 @@ const priorBundle = {
       version: '0.9.0',
       sourceCommit: '0000000000000000000000000000000000000000',
       releasedAt: '2026-11-01T00:00:00Z',
-      items: bundle.releases[0].items.map((item) => ({
-        ...item,
-        body: item.body.replace('version: 1.0.0', 'version: 0.9.0')
-      }))
+      // Simulate an older release published before the issue-drafting assets
+      // existed: old IDs remain, new IDs are absent from that immutable set.
+      items: bundle.releases[0].items
+        .filter((item) => !NEW_IDS.includes(item.id))
+        .map((item) => ({
+          ...item,
+          body: item.body.replace('version: 1.0.0', 'version: 0.9.0')
+        }))
     }
   ]
 };
@@ -156,6 +161,47 @@ test('pinned retrieval serves only the selected immutable release', async () => 
 test('list_workflows honours a pinned release version', async () => {
   const response = await call('list_workflows', { version: '0.9.0' }, priorHandler);
   assert.equal(response.result.structuredContent.release.version, '0.9.0');
+});
+
+test('current release lists and retrieves both issue-drafting assets', async () => {
+  const listed = await call('list_workflows');
+  const ids = listed.result.structuredContent.workflows.map((w) => w.id);
+  for (const id of NEW_IDS) assert.ok(ids.includes(id), `current list missing ${id}`);
+  for (const id of NEW_IDS) {
+    const response = await call('get_workflow', { id });
+    assert.equal(response.result.isError, undefined);
+    const result = response.result.structuredContent;
+    assert.equal(result.id, id);
+    assert.equal(result.kind, id.split(':')[0]);
+    assert.equal(result.release.version, '1.0.0');
+    assert.equal(result.sha256.length, 64);
+    assert.match(result.body, /Released guidance version: 1\.0\.0/);
+  }
+  const ref = await call('get_workflow', { id: 'reference:issue-drafting' });
+  assert.ok(ref.result.structuredContent.references.includes('template:implementation-issue'));
+});
+
+test('older release serves old IDs and reports new IDs unavailable without fallback', async () => {
+  const listed = await call('list_workflows', { version: '0.9.0' }, priorHandler);
+  const oldIds = listed.result.structuredContent.workflows.map((w) => w.id);
+  assert.ok(oldIds.includes('factory'));
+  assert.ok(oldIds.includes('reference:planning'));
+  for (const id of NEW_IDS) assert.ok(!oldIds.includes(id), `old list unexpectedly contains ${id}`);
+
+  for (const id of NEW_IDS) {
+    const response = await call('get_workflow', { id, version: '0.9.0' }, priorHandler);
+    assert.equal(response.result.isError, true);
+    assert.equal(response.result.structuredContent.error.code, 'ID_NOT_IN_RELEASE');
+    assert.match(response.result.structuredContent.error.message, /not present in release 0\.9\.0/);
+    assert.doesNotMatch(response.result.content[0].text, /Released guidance version: 1\.0\.0/);
+    assert.deepEqual(
+      response.result.structuredContent.availableVersions.map((v) => v.version),
+      ['1.0.0', '0.9.0']
+    );
+  }
+  const old = await call('get_workflow', { id: 'factory', version: '0.9.0' }, priorHandler);
+  assert.equal(old.result.structuredContent.release.version, '0.9.0');
+  assert.match(old.result.structuredContent.body, /Released guidance version: 0\.9\.0/);
 });
 
 // --- error semantics -----------------------------------------------------------

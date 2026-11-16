@@ -26,6 +26,7 @@ touch "$data_root/marker"
 summary="$summaries/2026-11-15-synthetic-opt-in.yaml"
 cp "$repo_root/templates/task-summary.yaml" "$summary"
 sed -i \
+  -e 's|"REPLACE_UTC_timestamp"|"2026-11-16T16:00:00Z"|' \
   -e 's|"REPLACE_factory_version"|"ega-software-factory@0.1.0+t09-synthetic"|' \
   -e 's|"REPLACE_project"|"synthetic-fixture"|' \
   -e 's|"REPLACE_task"|"synthetic T09 opt-in scenario (no real task data)"|' \
@@ -108,6 +109,9 @@ done
 
 python3 "$here/test-destinations.py"
 check $? "destination precedence and boundary checks"
+
+python3 "$here/test-reports.py"
+check $? "structured reports and legacy compatibility"
 
 # --- S5: network observation limits ---
 # Limited observation: this can only show that the test scripts contain no
