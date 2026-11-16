@@ -1,0 +1,11 @@
+{
+  "name": "ega-software-factory-mcp-worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Read-only Cloudflare Worker serving released EGA Software Factory guidance over MCP Streamable HTTP. Zero runtime and build dependencies.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build:api": "node scripts/build-api-module.mjs"
+  }
+}

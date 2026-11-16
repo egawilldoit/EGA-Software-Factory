@@ -1,6 +1,6 @@
 {
   "name": "ega-software-factory",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Thin Codex plugin that routes software work to factory, planning, verification, and improvement workflows.",
   "author": {
     "name": "EGAWILLDOIT"
@@ -10,7 +10,7 @@
   "interface": {
     "displayName": "EGA Software Factory",
     "shortDescription": "Route software work to factory workflows",
-    "longDescription": "A small Codex plugin with four skills: factory, factory-plan, factory-verify, and factory-improve. Packaging and references are present; host install/refresh/rollback was observed on one Linux host and the real pilot is pending.",
+    "longDescription": "Four workflow skills for proportionate planning, implementation, verification, review and improvement. Hosts provide execution and permissions; see the release evidence for tested environments.",
     "developerName": "EGAWILLDOIT",
     "category": "Productivity",
     "capabilities": [

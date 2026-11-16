@@ -1,65 +1,51 @@
 # EGA Software Factory
 
-Small Codex plugin that routes software work to proportional planning, verification, review, and improvement workflows. Ships four thin skills: factory, factory-plan, factory-verify, factory-improve.
+Four agent skills for planning, implementing, verifying and reviewing one software outcome. The host supplies models, tools and permissions.
 
-Status: v4 candidate. Real Codex host install/refresh/rollback observed on one Linux host (openclaw, Codex CLI 0.169.0, 2026-11-15) via a local marketplace. A scoped real-task pilot was run in this repo for T3 skill discovery and docs (2026-11-16; see `docs/pilot-t3-skill-discovery.md`). Full end-to-end readiness is not claimed.
+V1 distribution is being verified. The workflow design is v4; the first portable package is v1.0.0. ChatGPT connection testing is deferred.
 
-## Supported host (tested)
+## Install and use
 
-- Host: openclaw (Linux), user ubuntu.
-- Client: Codex CLI 0.169.0.
-- Observed: 2026-11-15.
-- Install/refresh/rollback exercised via a local marketplace source.
-
-Untested/unverified: Windows, other VMs, ChatGPT web, Claude Code, IDE extensions, Git-backed remote marketplaces (codex plugin marketplace upgrade).
-
-## Prerequisites
-
-- Codex CLI 0.169.0 or compatible.
-- Local checkout of this repository.
-- Git.
-- `jq` — required only by the T10 delivery fixture for JSON report serialization (`fixtures/t10/delivery.sh`); the plugin itself does not require it.
-- `python3` with PyYAML (`import yaml`) — required only by the opt-in summary validator (`tests/scenarios/summary/validate-summary.sh`); it fails closed with `YAML parser unavailable` if PyYAML is absent. The destination checks use the Python standard library.
-- Optional for web-specialist routing: Node.js >= 22 and Modern Web Guidance CLI (references/web-guidance.md).
-
-Plugin performs no network access of its own.
-
-## Install (tested path: local marketplace)
+Requires Node.js 22 or later. The installer targets the shared `~/.agents/skills` location used by Codex and OpenCode. Start a fresh host session after installation.
 
 ```sh
-codex plugin marketplace add /path/to/EGA-Software-Factory
-codex plugin add ega-software-factory@ega-software-factory
-codex plugin list
+npx @egawilldoit/factory@1.0.0 install
+npx @egawilldoit/factory@1.0.0 doctor
 ```
 
-Expected: plugin name ega-software-factory, version 0.1.0, cache under ~/.codex/plugins/cache/ega-software-factory/ega-software-factory/0.1.0/.
-
-Notes: Git-backed marketplace install/upgrade not exercised (unverified). Adding same marketplace name from a different path requires removing it first. Plugin must be installed before invoking skills.
-
-## Invoke
-
-In a fresh Codex session:
+In Codex, use `$factory`. In T3/OpenCode, select `factory` in the skill menu or use `/skill:factory` where the client supports that command.
 
 ```text
-$factory
+Use factory to fix [one concrete bug]. Inspect existing work, make the smallest
+useful change, verify the final behavior and review the diff. Stop at a local fix.
 ```
 
-Also exposes $factory-plan, $factory-verify, $factory-improve. The instructions direct the agent to preserve read-only boundaries; the host enforces actual permissions.
+For an authorized rollout, specify the outcome, for example "get this scoped fix live." A PR-only request does not authorize merging. Actual project requirements and tool permissions still apply.
 
-### Use in T3 / OpenCode
-
-The four skills are registered from this repo's `.opencode/opencode.json`, so no
-global install is needed. Open the repo in T3 and type `/skill:factory` (or pick
-**factory** from the skill menu); the other three load as `/skill:factory-plan`,
-`/skill:factory-verify`, and `/skill:factory-improve`. T3 reloads project config
-on save; run `/reload` in a fresh session if a skill is not listed yet.
-
-Example:
-
-```text
-/skill:factory
-Assess this repo and route a small documentation fix; keep it read-only.
+```sh
+npx @egawilldoit/factory@latest update
+npx @egawilldoit/factory@latest doctor
+npx @egawilldoit/factory@latest rollback
+npx @egawilldoit/factory@latest uninstall
 ```
+
+Local installs remain pinned until updated. The installer preserves unrelated skills and refuses updates over local modifications. Rollback and uninstall save modified owned files under `.factory-preserved` before replacing or removing them. `doctor` distinguishes file integrity from real host discovery. If an existing project or plugin already supplies `factory`, choose one installation rather than loading duplicates. It does not silently take ownership of earlier manually copied skills.
+
+## Hosted guidance
+
+The Cloudflare MCP channel supplies public released instructions only. It cannot access your repositories, execute work or change production. Its stable URL advances on a stable tagged release. Start by reading the version, then include that version in subsequent retrieval calls to avoid mixing releases.
+
+ChatGPT custom MCP connection testing is deferred. No ChatGPT compatibility is claimed yet. The endpoint will be `https://ega-software-factory.a2003-2015.workers.dev/mcp`; deployment and protocol evidence will be recorded after verification.
+
+## Release and contributor setup
+
+Canonical content lives in `skills/`, `references/` and `templates/`. The npm installer and Worker use the same versioned bundle. Releases come from stable `vX.Y.Z` tags, not every merge. See the [shipping plan](docs/v1-shipping-plan.md).
+
+For checkout-specific Codex marketplace install, refresh and rollback, see [local marketplace instructions](docs/local-marketplace.md). The repo's `.opencode/opencode.json` registers source skills for contributors; that is separate from a portable installation.
+
+Linux is the initial verification target; Windows and macOS remain unverified. T3 menu behavior depends on the client; skill-tool discovery and UI keypress testing are separate checks.
+
+Only fixture tooling needs `jq` or Python with PyYAML. The installer has no runtime dependencies beyond Node. Web specialist tools remain optional and are not bundled.
 
 ## Skills
 
@@ -93,32 +79,7 @@ Off by default. Written only on explicit user request.
 
 Synthetic scenario evidence (historical 2026-11-15 run, Linux VM openclaw, bash): 12/12 passed at that time. Filesystem-level checks, not host telemetry tests. The current verified count is 19/19 (see Verification status).
 
-## Refresh and rollback
-
-Source of truth: marketplace source dir or repo revision. Installed copy: ~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/. Version in .codex-plugin/plugin.json.
-
-Refresh (local marketplace; observed):
-1. codex plugin marketplace add /path/to/marketplace-vA --json
-2. codex plugin add ega-software-factory@ega-software-factory --json  (observed 0.1.0)
-3. Update same marketplace source to version B.
-4. codex plugin add ega-software-factory@ega-software-factory --json  (observed 0.2.0, old cache removed)
-5. Start fresh Codex session and invoke $factory.
-
-Notes: codex plugin marketplace upgrade applies to Git marketplaces; local refresh by re-running add. No automatic instant sync; reinstall + fresh session required. Plugin updates are not task-summary sync.
-
-Rollback:
-1. Restore marketplace source to known-good (or remove/re-add pointing to preserved source).
-2. codex plugin add ega-software-factory@ega-software-factory --json (observed returns to 0.1.0, newer cache removed).
-
-Alternative full remove/reinstall:
-```sh
-codex plugin remove ega-software-factory@ega-software-factory --json
-codex plugin marketplace remove ega-software-factory
-# add preserved known-good marketplace, then install
-```
-Rollback requires preserved known-good source; Codex does not keep multiple versions in cache.
-
-## Verification status (honest)
+## Workflow verification status
 
 - Synthetic summary scenarios: 19/19 passed (2026-11-16; python3 + PyYAML).
 - Delivery-boundary scenarios vs mock host: 55/55 checks passed (S1-S9 plus added report/escaping/unwritable-report coverage). All external ops were MOCKS; no real provider push/PR/merge/CI/deploy or real automatic deployment exercised (fixtures/t10/README.md).
@@ -135,7 +96,7 @@ Rollback requires preserved known-good source; Codex does not keep multiple vers
 - Untested platforms remain unverified.
 - Same-agent review is not independent; label same-agent.
 - Static checks and mock hosts are not proof of real provider/browser behavior.
-- No automatic telemetry, dashboard, cross-machine sync, or hosted service exists or is claimed.
+- No automatic telemetry, dashboard, remote executor or cross-machine summary sync is included.
 
 ## Provenance and adaptation
 

@@ -1,0 +1,106 @@
+name: release
+
+# Stable vX.Y.Z tag push releases the same bundle to npm, GitHub and Cloudflare.
+# workflow_dispatch checks out the requested tag (dry_run defaults to true: no
+# writes). Packing happens once; publish channels check artifact identity on rerun.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Stable tag to check out and release (e.g. v1.0.0).'
+        required: false
+        type: string
+      dry_run:
+        description: 'Validate, build and pack only; skip npm/GitHub/Cloudflare writes.'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '22'
+  NPM_CONFIG_REGISTRY: 'https://registry.npmjs.org'
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+  # Parent wires these to the real root scripts once the installer finishes.
+  BUILD_CMD: 'npm run build'
+  TEST_CMD: 'npm run test:package'
+  CF_DEPLOY_CMD: ''
+  CF_WORKER_URL: '${{ vars.CF_WORKER_URL }}'
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+
+jobs:
+  release:
+    name: Build once, publish and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout requested tag (full history)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag commit matches checked-out HEAD
+        run: |
+          set -euo pipefail
+          tag_commit="$(git rev-parse --verify "${RELEASE_TAG}^{commit}")"
+          head_commit="$(git rev-parse HEAD)"
+          if [ "$tag_commit" != "$head_commit" ]; then
+            echo "tag $RELEASE_TAG resolves to $tag_commit, HEAD is $head_commit" >&2
+            exit 1
+          fi
+          echo "Verified $RELEASE_TAG -> $head_commit"
+
+      - name: Install root dependencies only if declared
+        run: |
+          if node -e 'const p=require("./package.json");process.exit(Object.keys(p.dependencies||{}).length+Object.keys(p.devDependencies||{}).length?0:1)'; then
+            npm install --ignore-scripts --no-audit --no-fund
+          else
+            echo "No root dependencies declared; skipping npm install"
+          fi
+
+      - name: Retrieve verified previous stable package
+        run: node scripts/release/previous.mjs
+
+      - name: Build canonical bundle at source commit, validate and test
+        run: bash scripts/release/release.sh prepare
+
+      - name: Pack once
+        run: bash scripts/release/release.sh pack
+
+      - name: Publish to npm (identity-gated)
+        if: ${{ env.DRY_RUN != 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bash scripts/release/release.sh publish-npm
+
+      - name: Create/verify GitHub release (identity-gated)
+        if: ${{ env.DRY_RUN != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/release/release.sh release-github
+
+      - name: Deploy bundle to Cloudflare Worker
+        if: ${{ env.DRY_RUN != 'true' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/release/release.sh deploy-cf
+
+      - name: Report observed release metadata
+        if: always()
+        run: bash scripts/release/release.sh summary >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-16T00:00:00Z",
+  "defaultVersion": "1.0.0",
+  "releases": [
+    {
+      "version": "1.0.0",
+      "sourceCommit": "1111111111111111111111111111111111111111",
+      "releasedAt": "2026-11-16T00:00:00Z",
+      "items": [
+        {
+          "id": "factory",
+          "kind": "skill",
+          "title": "Factory",
+          "description": "Main entry point: establish repository, scope, risk and authorized stopping point, then route to the smallest useful workflow.",
+          "body": "# Factory\n\nMain entry point: establish repository, scope, risk and authorized stopping point, then route to the smallest useful workflow.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "0f821c620f821c620f821c620f821c620f821c620f821c620f821c620f821c62",
+          "references": [
+            "reference:workflow",
+            "reference:risk-and-delivery",
+            "reference:verification-and-review"
+          ]
+        },
+        {
+          "id": "factory-plan",
+          "kind": "skill",
+          "title": "Factory Plan",
+          "description": "Resolve consequential uncertainty into a scoped plan with outcome, boundaries, risk, acceptance criteria and verification.",
+          "body": "# Factory Plan\n\nResolve consequential uncertainty into a scoped plan with outcome, boundaries, risk, acceptance criteria and verification.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "d3431cd8d3431cd8d3431cd8d3431cd8d3431cd8d3431cd8d3431cd8d3431cd8",
+          "references": [
+            "reference:planning"
+          ]
+        },
+        {
+          "id": "factory-verify",
+          "kind": "skill",
+          "title": "Factory Verify",
+          "description": "Establish evidence for a change: essential checks, behavior verification and an honestly labelled separate final review.",
+          "body": "# Factory Verify\n\nEstablish evidence for a change: essential checks, behavior verification and an honestly labelled separate final review.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "a727e6b2a727e6b2a727e6b2a727e6b2a727e6b2a727e6b2a727e6b2a727e6b2",
+          "references": [
+            "reference:verification-and-review"
+          ]
+        },
+        {
+          "id": "factory-improve",
+          "kind": "skill",
+          "title": "Factory Improve",
+          "description": "Examine selected accessible evidence and propose the smallest useful testable improvement, or state that none is justified.",
+          "body": "# Factory Improve\n\nExamine selected accessible evidence and propose the smallest useful testable improvement, or state that none is justified.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "42fc774b42fc774b42fc774b42fc774b42fc774b42fc774b42fc774b42fc774b",
+          "references": [
+            "reference:improvement-and-metrics"
+          ]
+        },
+        {
+          "id": "reference:workflow",
+          "kind": "reference",
+          "title": "Workflow",
+          "description": "Scoped software workflow guidance: context, routing, scope preservation and critical obligations.",
+          "body": "# Workflow\n\nScoped software workflow guidance: context, routing, scope preservation and critical obligations.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "7414215274142152741421527414215274142152741421527414215274142152"
+        },
+        {
+          "id": "reference:skill-compatibility",
+          "kind": "reference",
+          "title": "Skill Compatibility",
+          "description": "Check purpose, dependencies, side effects, stopping point and installed version before invoking a candidate skill.",
+          "body": "# Skill Compatibility\n\nCheck purpose, dependencies, side effects, stopping point and installed version before invoking a candidate skill.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "131ea123131ea123131ea123131ea123131ea123131ea123131ea123131ea123"
+        },
+        {
+          "id": "reference:verification-and-review",
+          "kind": "reference",
+          "title": "Verification and Review",
+          "description": "Proportionate final verification and one bounded, honestly labelled review pass.",
+          "body": "# Verification and Review\n\nProportionate final verification and one bounded, honestly labelled review pass.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "773051f5773051f5773051f5773051f5773051f5773051f5773051f5773051f5",
+          "references": [
+            "doc:authorization-and-completion-scenarios",
+            "doc:v4-acceptance-status"
+          ]
+        },
+        {
+          "id": "reference:risk-and-delivery",
+          "kind": "reference",
+          "title": "Risk and Delivery",
+          "description": "Risk tiers, authorization boundaries, automatic delivery effects and stopping points.",
+          "body": "# Risk and Delivery\n\nRisk tiers, authorization boundaries, automatic delivery effects and stopping points.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "757c24bd757c24bd757c24bd757c24bd757c24bd757c24bd757c24bd757c24bd",
+          "references": [
+            "doc:authorization-and-completion-scenarios",
+            "doc:v4-acceptance-status"
+          ]
+        },
+        {
+          "id": "reference:pr-workflows",
+          "kind": "reference",
+          "title": "PR Workflows",
+          "description": "Check for an existing PR, keep descriptions focused, preserve credit and watch only when requested.",
+          "body": "# PR Workflows\n\nCheck for an existing PR, keep descriptions focused, preserve credit and watch only when requested.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "5e51ab2a5e51ab2a5e51ab2a5e51ab2a5e51ab2a5e51ab2a5e51ab2a5e51ab2a",
+          "references": [
+            "doc:authorization-and-completion-scenarios",
+            "doc:v4-acceptance-status"
+          ]
+        },
+        {
+          "id": "reference:takeover-and-modernize",
+          "kind": "reference",
+          "title": "Takeover and Modernize",
+          "description": "Recover the actual head, preserve authorship and modernize intent rather than mechanically rewriting.",
+          "body": "# Takeover and Modernize\n\nRecover the actual head, preserve authorship and modernize intent rather than mechanically rewriting.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "58abc59c58abc59c58abc59c58abc59c58abc59c58abc59c58abc59c58abc59c",
+          "references": [
+            "doc:authorization-and-completion-scenarios",
+            "doc:v4-acceptance-status"
+          ]
+        },
+        {
+          "id": "reference:web-guidance",
+          "kind": "reference",
+          "title": "Web Guidance",
+          "description": "Use current web platform guidance for HTML, CSS and client-side work.",
+          "body": "# Web Guidance\n\nUse current web platform guidance for HTML, CSS and client-side work.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "40b3f29040b3f29040b3f29040b3f29040b3f29040b3f29040b3f29040b3f290"
+        },
+        {
+          "id": "reference:improvement-and-metrics",
+          "kind": "reference",
+          "title": "Improvement and Metrics",
+          "description": "Opt-in local metrics and smallest-useful-improvement evidence.",
+          "body": "# Improvement and Metrics\n\nOpt-in local metrics and smallest-useful-improvement evidence.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "f4501d3ff4501d3ff4501d3ff4501d3ff4501d3ff4501d3ff4501d3ff4501d3f"
+        },
+        {
+          "id": "reference:planning",
+          "kind": "reference",
+          "title": "Planning",
+          "description": "Plan only when consequential uncertainty justifies it; keep the plan bounded and verifiable.",
+          "body": "# Planning\n\nPlan only when consequential uncertainty justifies it; keep the plan bounded and verifiable.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "3f9c67863f9c67863f9c67863f9c67863f9c67863f9c67863f9c67863f9c6786"
+        },
+        {
+          "id": "reference:synchronization",
+          "kind": "reference",
+          "title": "Synchronization",
+          "description": "Observed local install, refresh and rollback behavior across versions.",
+          "body": "# Synchronization\n\nObserved local install, refresh and rollback behavior across versions.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "a2225b17a2225b17a2225b17a2225b17a2225b17a2225b17a2225b17a2225b17"
+        },
+        {
+          "id": "reference:task-summary",
+          "kind": "reference",
+          "title": "Task Summary",
+          "description": "User-controlled local outcome summary with explicit fields and no fabricated costs or secrets.",
+          "body": "# Task Summary\n\nUser-controlled local outcome summary with explicit fields and no fabricated costs or secrets.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "76dfbc3376dfbc3376dfbc3376dfbc3376dfbc3376dfbc3376dfbc3376dfbc33",
+          "references": [
+            "doc:authorization-and-completion-scenarios"
+          ]
+        },
+        {
+          "id": "doc:authorization-and-completion-scenarios",
+          "kind": "doc",
+          "title": "Authorization and Completion Scenarios",
+          "description": "Designed agent-behavior scenarios for authorization and completion.",
+          "body": "# Authorization and Completion Scenarios\n\nDesigned agent-behavior scenarios for authorization and completion.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "bd2d007abd2d007abd2d007abd2d007abd2d007abd2d007abd2d007abd2d007a"
+        },
+        {
+          "id": "doc:v4-acceptance-status",
+          "kind": "doc",
+          "title": "V4 Acceptance Status",
+          "description": "Observed acceptance evidence and remaining unverified gaps.",
+          "body": "# V4 Acceptance Status\n\nObserved acceptance evidence and remaining unverified gaps.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "01e1605901e1605901e1605901e1605901e1605901e1605901e1605901e16059"
+        },
+        {
+          "id": "template:task-summary",
+          "kind": "template",
+          "title": "Task Summary Template",
+          "description": "YAML template for an opt-in local task summary.",
+          "body": "# Task Summary Template\n\nYAML template for an opt-in local task summary.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "14c12b7014c12b7014c12b7014c12b7014c12b7014c12b7014c12b7014c12b70"
+        }
+      ],
+      "notes": "Current release fixture; no previous release in the first release."
+    }
+  ],
+  "generator": "test-fixture (not a real release; current release only)"
+}

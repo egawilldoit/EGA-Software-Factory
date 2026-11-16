@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+/bundle/
+/*.tgz
+/worker/generated/released-guidance.json

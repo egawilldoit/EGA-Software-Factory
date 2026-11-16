@@ -1,0 +1,9 @@
+# Cloudflare Worker configuration (no dependencies required).
+# The Worker is also deployable as a single ES module via the Cloudflare API;
+# see README.md for the dependency-free multipart command.
+name = "ega-software-factory"
+main = "src/index.mjs"
+compatibility_date = "2025-06-18"
+workers_dev = true
+
+# Intentionally empty: no KV, D1, queues, routes, secrets or scheduled jobs.

@@ -1,0 +1,29 @@
+{
+  "name": "@egawilldoit/factory",
+  "version": "1.0.0",
+  "description": "Portable local installer for the EGA Software Factory skills bundle.",
+  "license": "UNLICENSED",
+  "bin": {
+    "factory": "bin/factory.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "bundle/",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "node scripts/build-bundle.js && node scripts/build-worker.mjs",
+    "test:package": "node tests/installer/run-scenarios.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egawilldoit/EGA-Software-Factory.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
