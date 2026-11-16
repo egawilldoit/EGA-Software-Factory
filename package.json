@@ -1,6 +1,6 @@
 {
   "name": "@egawilldoit/factory",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Portable local installer for the EGA Software Factory skills bundle.",
   "license": "UNLICENSED",
   "bin": {

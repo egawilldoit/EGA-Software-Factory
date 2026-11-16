@@ -2,15 +2,15 @@
 
 Four agent skills for planning, implementing, verifying and reviewing one software outcome. The host supplies models, tools and permissions.
 
-V1 distribution is being verified. The workflow design is v4; the first portable package is v1.0.0. ChatGPT connection testing is deferred.
+V1 distribution is being verified. The workflow design is v4; the portable package is v1.0.1. ChatGPT connection testing is deferred.
 
 ## Install and use
 
 Requires Node.js 22 or later. The installer targets the shared `~/.agents/skills` location used by Codex and OpenCode. Start a fresh host session after installation.
 
 ```sh
-npx @egawilldoit/factory@1.0.0 install
-npx @egawilldoit/factory@1.0.0 doctor
+npx @egawilldoit/factory@1.0.1 install
+npx @egawilldoit/factory@1.0.1 doctor
 ```
 
 In Codex, use `$factory`. In T3/OpenCode, select `factory` in the skill menu or use `/skill:factory` where the client supports that command.

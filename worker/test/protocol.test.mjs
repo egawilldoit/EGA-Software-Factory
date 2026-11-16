@@ -286,3 +286,28 @@ test('oversized request body is rejected', async () => {
   }));
   assert.equal(response.status, 413);
 });
+
+
+test('standalone deployment module exposes the Workers fetch contract', async () => {
+  const { mkdtemp, mkdir, copyFile, writeFile, rm } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { pathToFileURL } = await import('node:url');
+  const { execFileSync } = await import('node:child_process');
+  const root = await mkdtemp(join(tmpdir(), 'factory-worker-contract-'));
+  try {
+    for (const dir of ['src', 'scripts', 'generated']) await mkdir(join(root, dir));
+    for (const file of ['src/worker.mjs', 'scripts/build-api-module.mjs']) {
+      await copyFile(new URL('../' + file, import.meta.url), join(root, file));
+    }
+    await writeFile(join(root, 'generated/released-guidance.json'), JSON.stringify(bundle));
+    execFileSync(process.execPath, [join(root, 'scripts/build-api-module.mjs')]);
+    const { default: worker } = await import(pathToFileURL(join(root, 'dist/worker.mjs')));
+    assert.equal(typeof worker.fetch, 'function');
+    const response = await worker.fetch(new Request('https://example.test/health'));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).release.version, bundle.defaultVersion);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

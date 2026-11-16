@@ -16,7 +16,7 @@ JSON.parse(bundle);
 const output = `${runtime}
 // --- generated release bundle (inlined by build-api-module.mjs) ---
 const __RELEASE_BUNDLE = ${bundle};
-export default createMcpHandler({ index: createGuidanceIndex(__RELEASE_BUNDLE) });
+export default { fetch: createMcpHandler({ index: createGuidanceIndex(__RELEASE_BUNDLE) }) };
 `;
 
 const target = resolve(root, 'dist/worker.mjs');

@@ -5,4 +5,4 @@ import { createGuidanceIndex, createMcpHandler } from './worker.mjs';
 
 const index = createGuidanceIndex(bundle); // fail fast on an invalid release bundle
 
-export default createMcpHandler({ index });
+export default { fetch: createMcpHandler({ index }) };

@@ -1,6 +1,6 @@
 {
   "name": "ega-software-factory",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Thin Codex plugin that routes software work to factory, planning, verification, and improvement workflows.",
   "author": {
     "name": "EGAWILLDOIT"
