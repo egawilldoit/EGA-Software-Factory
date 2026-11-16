@@ -21,6 +21,14 @@ CF_DEPLOY_CMD="${CF_DEPLOY_CMD:-}"               # optional override for the mod
 CF_WORKER_URL="${CF_WORKER_URL:-}"               # deployed worker base URL for /health check
 DRY_RUN="${DRY_RUN:-false}"
 
+# Bounded Cloudflare propagation window. A successful module upload can leave an
+# edge cache briefly serving the previous release, so a single immediate 200 with
+# stale content must not fail the release. Stale bodies are retried; only an
+# exact version+commit match succeeds, and the channel fails terminally if it
+# never appears. Override these in tests to keep the window small and sleep free.
+HEALTH_MAX_ATTEMPTS="${HEALTH_MAX_ATTEMPTS:-12}"         # probes before terminal failure
+HEALTH_INTERVAL_SECONDS="${HEALTH_INTERVAL_SECONDS:-5}"  # delay between probes
+
 PACKAGE_NAME="@egawilldoit/factory"
 DESCRIPTOR_FILE="$REPO_ROOT/bundle/bundle.json"
 WORKER_BUNDLE="$REPO_ROOT/worker/generated/released-guidance.json"
@@ -48,6 +56,59 @@ if_dry_run() {
     record_status "$1" "not-run" "dry_run=true"
     return 0
   fi
+  return 1
+}
+
+# One /health probe. Overridable in tests so no network is required.
+probe_health() {
+  curl -fsS --max-time 30 "${CF_WORKER_URL%/}/health" -o "$1"
+}
+
+# Overridable in tests so the deterministic suite never actually sleeps.
+health_sleep() {
+  sleep "$1"
+}
+
+# Emit status, version and sourceCommit as a tab-separated line.
+health_fields() {
+  node -e '
+    const fs = require("fs");
+    let o = {};
+    try { o = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); } catch (_) {}
+    const r = o.release || {};
+    process.stdout.write([o.status || "", r.version || "", r.sourceCommit || ""].join("\t"));
+  ' "$1"
+}
+
+# Wait for exact version+commit at /health within a bounded propagation window.
+# Writes the matching body to $3 and reports the last observation through the
+# HEALTH_LAST_* globals. Returns 1 only after every allowed probe is exhausted.
+wait_for_health() {
+  local expected_version="$1" expected_commit="$2" out_file="$3"
+  local probe_file hs hv hc attempt=1
+  probe_file="$(mktemp)"
+  HEALTH_LAST_STATUS=""; HEALTH_LAST_VERSION=""; HEALTH_LAST_COMMIT=""; HEALTH_ATTEMPTS=0
+  while [ "$attempt" -le "$HEALTH_MAX_ATTEMPTS" ]; do
+    if probe_health "$probe_file"; then
+      IFS=$'\t' read -r hs hv hc <<<"$(health_fields "$probe_file")"
+      HEALTH_LAST_STATUS="$hs"; HEALTH_LAST_VERSION="$hv"; HEALTH_LAST_COMMIT="$hc"
+      if [ "$hs" = "ok" ] && [ "$hv" = "$expected_version" ] && [ "$hc" = "$expected_commit" ]; then
+        cp "$probe_file" "$out_file"
+        rm -f "$probe_file"
+        HEALTH_ATTEMPTS="$attempt"
+        return 0
+      fi
+      log "CF: /health probe $attempt/$HEALTH_MAX_ATTEMPTS not current (status=$hs version=$hv commit=$hc; want $expected_version/$expected_commit)"
+    else
+      log "CF: /health probe $attempt/$HEALTH_MAX_ATTEMPTS failed"
+    fi
+    if [ "$attempt" -lt "$HEALTH_MAX_ATTEMPTS" ]; then
+      health_sleep "$HEALTH_INTERVAL_SECONDS"
+    fi
+    attempt=$((attempt + 1))
+  done
+  rm -f "$probe_file"
+  HEALTH_ATTEMPTS="$((attempt - 1))"
   return 1
 }
 
@@ -314,20 +375,15 @@ cmd_deploy_cf() {
   log "CF: workers.dev subdomain enabled"
 
   # Confirm the deployed worker serves exactly this version and source commit.
-  local health hrc hs hv hc
-  health="$(mktemp)"; err="$(mktemp)"
-  set +e
-  curl -fsS --retry 4 --retry-all-errors --max-time 30 "${CF_WORKER_URL%/}/health" -o "$health" 2>"$err"
-  hrc=$?
-  set -e
-  [ $hrc -eq 0 ] || { cat "$err" >&2; fail_channel cloudflare "GET /health failed"; }
-  hs="$(node -e 'const o=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write(String(o.status||""))' "$health" || true)"
-  hv="$(node -e 'const o=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write((o.release&&o.release.version)||"")' "$health" || true)"
-  hc="$(node -e 'const o=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write((o.release&&o.release.sourceCommit)||"")' "$health" || true)"
-  [ "$hs" = "ok" ] && [ "$hv" = "$A_VERSION" ] && [ "$hc" = "$A_COMMIT" ] \
-    || fail_channel cloudflare "/health mismatch: status=$hs version=$hv commit=$hc (expected $A_VERSION/$A_COMMIT)"
-  record_status cloudflare "deployed" "health-version=$hv health-commit=$hc subdomain=enabled"
-  log "CF: confirmed /health version=$hv commit=$hc"
+  # Edge propagation may briefly serve the previous release after upload; retry
+  # stale bodies within a bounded window instead of failing on the first probe.
+  local health_body="$RELEASE_OUT/health.json"
+  mkdir -p "$RELEASE_OUT"
+  if ! wait_for_health "$A_VERSION" "$A_COMMIT" "$health_body"; then
+    fail_channel cloudflare "/health never reported current after $HEALTH_ATTEMPTS/$HEALTH_MAX_ATTEMPTS probes: last status=${HEALTH_LAST_STATUS} version=${HEALTH_LAST_VERSION} commit=${HEALTH_LAST_COMMIT} (expected $A_VERSION/$A_COMMIT)"
+  fi
+  record_status cloudflare "deployed" "health-version=$A_VERSION health-commit=$A_COMMIT subdomain=enabled probes=$HEALTH_ATTEMPTS"
+  log "CF: confirmed /health version=$A_VERSION commit=$A_COMMIT after $HEALTH_ATTEMPTS probe(s)"
 }
 
 cmd_summary() {
@@ -378,4 +434,6 @@ main() {
   esac
 }
 
-main "$@"
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+  main "$@"
+fi
