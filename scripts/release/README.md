@@ -15,6 +15,13 @@ Reruns: npm and GitHub compare published bytes to the local tarball (integrity /
 shasum / asset sha256); identical means skip, different means fail, registry
 errors never mean "skip". CF is deployed only after root canonical metadata
 parity passes, then confirmed by `GET /health` (exact version and source commit).
+An edge cache can briefly serve the previous release after a successful upload,
+so health confirmation polls a bounded window (`HEALTH_MAX_ATTEMPTS`, default
+12, `HEALTH_INTERVAL_SECONDS`, default 5): stale status/version/commit or a
+failed probe is retried, only an exact `ok` + version + commit match succeeds,
+and the channel fails terminally with the last observation if it never matches.
+Deterministic tests (`tests/release/health-verification.sh`) mock the probe and
+sleep, so they never use the network or sleep in real time.
 
 ## Observed status only
 
