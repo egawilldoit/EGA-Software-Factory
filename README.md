@@ -31,6 +31,28 @@ npx @egawilldoit/factory@latest uninstall
 
 Local installs remain pinned until updated. The installer preserves unrelated skills and refuses updates over local modifications. Rollback and uninstall save modified owned files under `.factory-preserved` before replacing or removing them. `doctor` distinguishes file integrity from real host discovery. If an existing project or plugin already supplies `factory`, choose one installation rather than loading duplicates. It does not silently take ownership of earlier manually copied skills.
 
+## From an idea to an agent-ready issue
+
+Ask `factory` to draft an issue. For example:
+
+```text
+Use factory to turn this into a self-contained implementation issue for
+<repository>: <idea or bug>. Inspect current code and existing issues, record
+what is observed versus assumed, and draft only. Do not publish yet.
+```
+
+Factory drafts by default and makes no external writes. A clear bug becomes one issue without an interview; an ambiguous idea surfaces only material decisions, with a recommendation that is not treated as approval. It checks for existing work, distinguishes reported from reproduced behavior, and reports specification readiness, dependency blocking and publication state separately. An already-implemented request is reported with evidence instead of duplicated.
+
+An explicit request such as "publish that draft to `<repository>`" creates only the requested issues and necessary dependency references, verifies the resulting links, and reports any partial failure without duplicating issues. Publication ends planning and starts no coding. A later implementation session can use:
+
+```text
+Use factory to implement <issue URL>. Read its body, comments and current
+repository instructions. Recheck current behavior and dependencies, then work
+to the delivery boundary I specify for this implementation task.
+```
+
+The portable contract is `templates/implementation-issue.md`; detailed guidance is `references/issue-drafting.md`. In the release that includes this change, the read-only MCP channel serves them as `reference:issue-drafting` and `template:implementation-issue`. A pinned older release that predates them still serves its old IDs; requesting the new IDs at that version returns `ID_NOT_IN_RELEASE` rather than current content.
+
 ## Hosted guidance
 
 The Cloudflare MCP channel supplies public released instructions only. It cannot access your repositories, execute work or change production. Its stable URL advances on a stable tagged release. Start by reading the version, then include that version in subsequent retrieval calls to avoid mixing releases.
@@ -66,22 +88,23 @@ Plugin is guidance; does not enforce OS sandbox, network, permissions, CI. Deliv
 
 ## Opt-in task summaries (privacy)
 
-Off by default. Written only on explicit user request.
+Off by default. Enable for one task or once per project in existing project instructions; agents then write one local report at completion or blocked handoff. See [task reporting](references/task-summary.md) for the setting and later review prompt.
 
-- Default location: ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<date>-<short-task>.yaml. The user's authorized destination and write boundary take precedence.
+- Default location: ${XDG_DATA_HOME:-$HOME/.local/share}/ega-factory/summaries/<UTC-timestamp>-<short-task>-<unique-suffix>.yaml. The user's authorized destination and write boundary take precedence.
 - Dir mode 0700, file mode 0600.
-- schema_version: 1; fields: factory version, project, task, base, final revision, worktree state, environment, outcome, verification, review, duration, cost, lesson.
+- New reports use schema_version: 2; schema 1 remains supported. Includes context, task/thread/PR links, individual check results, review independence, separate merge/deploy/live evidence, blockers and rework.
 - Unknown duration/cost is null/unknown, never 0 or estimate.
-- No default upload, background service, automatic collection, or cross-machine sync in v1; recording performs no network access.
+- No default upload, background service, transcript collection, or cross-machine sync; local recording performs no network access.
 - Do not store credentials, full prompts, private diffs, unrelated transcripts.
 - Retention: persists until user deletes. Other copies or backups may exist.
 - Template: templates/task-summary.yaml. Validation: tests/scenarios/summary/validate-summary.sh.
 
-Synthetic scenario evidence (historical 2026-11-15 run, Linux VM openclaw, bash): 12/12 passed at that time. Filesystem-level checks, not host telemetry tests. The current verified count is 19/19 (see Verification status).
+Synthetic scenario evidence (historical 2026-11-15 run, Linux VM openclaw, bash): 12/12 passed at that time. Filesystem-level checks, not host telemetry tests. The current verified count is 20/20 (see Verification status).
 
 ## Workflow verification status
 
-- Synthetic summary scenarios: 19/19 passed (2026-11-16; python3 + PyYAML).
+- v1.1.0 candidate (prepared, not published): 19/19 installer, 20/20 summary, 55/55 delivery (mock host) and 29/29 Worker checks passed; adapter also tested against the actual published v1.0.1 package (pinned new IDs return `ID_NOT_IN_RELEASE`). No v1.1.0 npm/GitHub/Cloudflare release yet.
+- Synthetic summary scenarios: 20/20 passed (2026-11-16; python3 + PyYAML).
 - Delivery-boundary scenarios vs mock host: 55/55 checks passed (S1-S9 plus added report/escaping/unwritable-report coverage). All external ops were MOCKS; no real provider push/PR/merge/CI/deploy or real automatic deployment exercised (fixtures/t10/README.md).
 - Manifests parse as valid JSON; skill names match directories.
 - Refresh/rollback evidence: one local-host run, Codex CLI 0.169.0, 0.1.0 <-> 0.2.0, fresh-session invocation recorded (references/synchronization.md).
@@ -111,6 +134,8 @@ Per-source provenance is recorded in
 This adaptation deliberately keeps full-send/full-stop and council
 **out** of automatic routing: merge/deploy and multi-reviewer rounds require
 the user's stated outcome, and no universal approval gate is added.
+
+Issue-drafting methods are adapted in original wording from Matt Pocock skills (MIT License, Copyright (c) 2026 Matt Pocock), upstream revision `5863806dd4e15c63174bee4e7515a4256792ecfa`: grilling via grill-me, triage agent briefs, to-spec and to-tickets. No substantial upstream text is copied. Automatic publishing, labels, commits, approval loops, exhaustive interviews, mandatory ticket fan-out and subagent delegation are deliberately not inherited. See `references/issue-drafting.md`.
 
 ## Acceptance scenarios
 

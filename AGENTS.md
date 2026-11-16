@@ -52,3 +52,7 @@ Do not publish packages, create releases or deploy merely because credentials ar
 ## Communication
 
 Be short and concrete. Report what changed, checks and results, and remaining material gaps. Do not invent readiness, independence, costs or tool use. Maintain existing documentation when behavior changes; avoid duplicate implementation diaries or broad cleanup during focused work.
+
+## Factory task reporting
+
+Factory reporting: enabled for this project. At the end of each Factory task, or when handing off blocked work, save a local outcome report using `references/task-summary.md` and include its absolute path. Task-specific opt-out and read-only/no-write instructions take precedence. Do not store prompts, transcripts, secrets or private diffs.

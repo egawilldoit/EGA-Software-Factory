@@ -50,6 +50,7 @@ for (const name of fs.readdirSync(path.join(root, 'references')).sort()) {
   if (name.endsWith('.md')) sources.push(`references/${name}`);
 }
 sources.push('templates/task-summary.yaml');
+sources.push('templates/implementation-issue.md');
 sources.push('docs/authorization-and-completion-scenarios.md');
 sources.push('docs/v4-acceptance-status.md');
 

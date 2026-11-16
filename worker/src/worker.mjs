@@ -26,13 +26,15 @@ export const ALLOWED_IDS = Object.freeze([
   'reference:web-guidance',
   'reference:improvement-and-metrics',
   'reference:planning',
+  'reference:issue-drafting',
   'reference:synchronization',
   'reference:task-summary',
   // canonical docs linked from the references above
   'doc:authorization-and-completion-scenarios',
   'doc:v4-acceptance-status',
-  // canonical template
-  'template:task-summary'
+  // canonical templates
+  'template:task-summary',
+  'template:implementation-issue'
 ]);
 
 const ALLOWED = new Set(ALLOWED_IDS);

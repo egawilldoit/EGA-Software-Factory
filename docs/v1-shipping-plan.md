@@ -2,6 +2,8 @@
 
 Status: v1.0.1 published on 2026-11-16. The installer, release automation and read-only Cloudflare channel are implemented. See [observed release evidence](v1-release-evidence.md) for checks and remaining limits. The existing v4 document describes the workflow design.
 
+The v1.1.0 candidate adds portable idea-to-issue guidance (a `reference:issue-drafting` reference and `template:implementation-issue` template) and structured task reports. Its version declarations are prepared and local checks pass, but v1.1.0 is **not yet published or deployed**; v1.0.1 remains the published stable release until a tagged release completes. Pinned v1.0.1 keeps serving its original 18 assets and reports the new IDs as unavailable rather than backfilling content.
+
 ## Outcome
 
 Maintain one repository and one versioned workflow bundle. Users install it locally with one command or connect a supported assistant to one hosted MCP endpoint. Updates come from stable releases, with visible versions and a rollback path.

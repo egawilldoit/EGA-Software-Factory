@@ -178,6 +178,29 @@
           "sha256": "01e1605901e1605901e1605901e1605901e1605901e1605901e1605901e16059"
         },
         {
+          "id": "reference:issue-drafting",
+          "kind": "reference",
+          "title": "Issue Drafting",
+          "description": "Turn an idea or bug into a self-contained, evidence-backed issue with authorized publication and handoff.",
+          "body": "# Issue Drafting\n\nTurn an idea or bug into a self-contained, evidence-backed issue with authorized publication and handoff.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "1d2c3b4a1d2c3b4a1d2c3b4a1d2c3b4a1d2c3b4a1d2c3b4a1d2c3b4a1d2c3b4a",
+          "references": [
+            "reference:planning",
+            "template:implementation-issue"
+          ]
+        },
+        {
+          "id": "template:implementation-issue",
+          "kind": "template",
+          "title": "Implementation Issue Template",
+          "description": "Portable agent contract for a self-contained, observable implementation issue.",
+          "body": "# Implementation Issue Template\n\nPortable agent contract for a self-contained, observable implementation issue.\n\nReleased guidance version: 1.0.0.\nThis text is guidance only; it performs no execution and has no repository access.",
+          "sha256": "5e6f7a8b5e6f7a8b5e6f7a8b5e6f7a8b5e6f7a8b5e6f7a8b5e6f7a8b5e6f7a8b",
+          "references": [
+            "reference:issue-drafting"
+          ]
+        },
+        {
           "id": "template:task-summary",
           "kind": "template",
           "title": "Task Summary Template",

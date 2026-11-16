@@ -13,6 +13,21 @@ Observed on 2026-11-16 on Linux `openclaw` (Node 24 locally; Node 22 in GitHub A
 
 V1.0.0 published successfully to npm and GitHub but failed Cloudflare health verification: the module exported a function instead of the Workers `{ fetch }` contract. V1.0.1 fixes both entry points and adds a regression check against the generated deployment module. Published versions and tags were preserved.
 
+## Next release (v1.1.0) — prepared, not published
+
+The v1.1.0 candidate adds idea-to-issue drafting guidance and structured task
+reports. Version declarations are set to `1.1.0`; local candidate checks passed
+on 2026-11-16: 19 installer scenarios, 20 summary scenarios, 55 delivery-boundary
+checks (mock host) and 29 Worker tests. Building against the **actual published
+v1.0.1 package** (retrieved with `scripts/release/previous.mjs`) produced a
+current release of 20 assets including both new IDs and a pinned previous
+release of the original 18 assets; the new IDs requested at pinned `1.0.1`
+returned `ID_NOT_IN_RELEASE` with no current-content fallback. These are local
+checks against a candidate, not evidence of a published npm package, GitHub
+release or live Cloudflare deployment. No v1.1.0 tag, publication or deployment
+had occurred when this was recorded; v1.0.1 remained the published stable
+release.
+
 ## Observed distribution checks
 
 The official MCP TypeScript SDK connected to the live Streamable HTTP endpoint, discovered all three tools, retrieved all 18 current-release items and verified their hashes against the GitHub release bundle. The same checks passed for pinned v1.0.0 retrieval; the default remained v1.0.1. Invalid IDs and unavailable versions returned errors without falling back to another release. These checks cover retrieval, not agent execution.

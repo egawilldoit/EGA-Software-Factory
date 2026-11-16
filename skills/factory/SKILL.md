@@ -15,6 +15,7 @@ Record, without mutating:
 - Risk tier: low, normal, or high (impact, reversibility, blast radius).
 - Available capabilities and their compatibility (skills, tools, tests, browser, host).
 - User/project/model preferences and authorization boundaries.
+- Whether local reporting is enabled in project instructions or requested for this task.
 
 Before implementation, identify the acceptance evidence needed to demonstrate the requested behavior. Before delivery, perform proportionate final behavior verification and a separate code review pass; disclose unavailable evidence and limitations. Label same-agent review honestly.
 
@@ -31,6 +32,7 @@ Choose only the work that the request and risk require:
 | Situation | Route |
 | --- | --- |
 | Need resolve consequential uncertainty | `factory-plan` |
+| Idea, bug or existing issue to clarify or publish | `factory-plan` issue-drafting mode with `../../references/issue-drafting.md` and `../../templates/implementation-issue.md`; draft by default, publish only when explicitly authorized |
 | Take over or modernize existing PR/branch/thread | `../../references/takeover-and-modernize.md` |
 | Need implementation/investigation | implement directly or with an explicitly permitted delegate |
 | Final behavior verification | `factory-verify` |
@@ -77,8 +79,13 @@ Keep these visible regardless of route; details live in the linked references.
 - **Delivery outcomes:** permission is separate from readiness. Assess automatic effects early; never infer blanket production authorization from silence. Later instructions update scope, but host/tool restrictions still apply.
 - **No-merge / PR-ready:** apply only when the user clearly requests that outcome. A plain "stop"/"pause"/"full stop" means stop — begin no new edits, pushes, review rounds or watchers. When authorized, preserve the no-merge boundary; do not inherit automatic disabling of auto-merge/queue settings without authorization. Resolve conflicting automation before pushing rather than silently changing settings.
 - **Council:** optional and user-requested only; no unbounded rounds or score gates.
+- **Issue publication:** draft by default. An explicit request authorizes only the requested issues and necessary references in the identified repository; verify the destination and resulting links, disclose partial failures, and never start coding from publication alone (`../../references/issue-drafting.md`).
 
-## 7. References
+## 7. Outcome reports
+
+When project reporting is enabled or a task report is requested, follow `../../references/task-summary.md` at completion or blocked handoff. Save one concise local report for the task, update it on resumption, and include its absolute path in delivery. Respect task-specific opt-out and no-write boundaries. No transcripts or background collection.
+
+## 8. References
 
 Paths below are relative to this skill file; load only the references relevant to the task.
 
@@ -91,6 +98,8 @@ Paths below are relative to this skill file; load only the references relevant t
 - `../../references/web-guidance.md`
 - `../../references/improvement-and-metrics.md`
 - `../../references/planning.md`
-- `../../references/task-summary.md` (only when a summary is explicitly requested)
+- `../../references/issue-drafting.md` (idea/bug to issue requests)
+- `../../templates/implementation-issue.md` (portable issue contract)
+- `../../references/task-summary.md` (when project reporting is enabled or a task report is requested)
 
 If a referenced skill is unavailable, use its documented fallback and continue the workflow.

@@ -8,7 +8,7 @@ See [RELEASE-BUNDLE-INTERFACE.md](RELEASE-BUNDLE-INTERFACE.md) for the JSON gene
 
 Endpoint: `/mcp` (POST). Health: `GET /health` (version, source commit, allowed-id count; no secrets).
 
-Tools: `list_workflows`, `get_workflow`, `get_version`. Every tool response includes release version and source commit in both text and `structuredContent`. Pinned `version` reads one immutable release only; unavailable versions return `VERSION_UNAVAILABLE` rather than falling back to latest. Invalid ids return `ID_NOT_ALLOWED` with the full allowlist.
+Tools: `list_workflows`, `get_workflow`, `get_version`. Every tool response includes release version and source commit in both text and `structuredContent`. Pinned `version` reads one immutable release only; unavailable versions return `VERSION_UNAVAILABLE` rather than falling back to latest. Invalid ids return `ID_NOT_ALLOWED` with the full allowlist. An allowlisted id that a pinned older release predates returns `ID_NOT_IN_RELEASE` — never current-release content. Current releases add `reference:issue-drafting` and `template:implementation-issue` for the portable idea-to-issue guidance.
 
 Protocol: initialization-based MCP, latest supported `2025-11-25` (also `2025-06-18`, `2025-03-26`). Standard `initialize` / `tools/list` / `tools/call` / `ping`, JSON-RPC errors, 202 for notifications, 405 for GET/DELETE, 400 for unsupported `MCP-Protocol-Version`. Per-request metadata and `server/discover` from `2026-07-28` are not implemented (see gaps).
 

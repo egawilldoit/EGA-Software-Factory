@@ -34,7 +34,7 @@ bash tests/scenarios/summary/validate-summary.sh <summary.yaml>
 | S5 | Network behavior | Test scripts contain no network-capable commands | 1/1 pass (limited — see below) |
 | S6 | Whole run | No files created inside the repository during the run | 1/1 pass |
 
-Current result on `openclaw` (2026-11-16): 19 passed, 0 failed.
+Current result on `openclaw` (2026-11-16): 20 passed, 0 failed, including 8 structured-report tests.
 
 The runner also tests HOME/XDG precedence, explicit destinations, canonical containment, and symlink escapes using a synthetic model of the documented path contract.
 
@@ -45,6 +45,7 @@ The runner also tests HOME/XDG precedence, explicit destinations, canonical cont
 - `fixtures/opt-in-synthetic.yaml` — valid synthetic summary.
 - `fixtures/invalid-secret.yaml` — negative fixture: unknown/secret key with an obviously fake placeholder token (not, and never, a real credential).
 - `fixtures/invalid-credential-pattern.yaml` — fake credential-shaped value in an allowed field, to exercise the pattern check independently.
+- `test-reports.py` — schema 2 statuses, required evidence, review independence, delivery unknowns, UTC timestamps, safe links and schema 1 compatibility.
 - `test-destinations.py` — synthetic path-contract checks; this is not the agent's runtime implementation or an OS sandbox.
 - `fixtures/invalid-fabricated-cost.yaml` — negative fixture: `cost: 0` without a `# measured` source note.
 
@@ -56,8 +57,10 @@ The runner also tests HOME/XDG precedence, explicit destinations, canonical cont
   the test scripts contain no network-capable commands.
 - The runner replaces HOME with an isolated temporary home and does not inspect
   or alter the user's existing summaries. Its opt-out check does not invoke Codex.
-- Manual recording only. No automatic collection, upload, background service,
+- Reports are agent-written at handoff under task/project opt-in. No transcript collection, upload, background service,
   or cross-machine synchronization is claimed or tested.
 - Fixtures live in the repository as labeled synthetic test data; real
-  summaries must never be written into any repository (see
+  summaries stay outside repositories by default unless the user explicitly chooses another permitted destination (see
   `references/task-summary.md`).
+
+Project opt-in, opt-out precedence and resuming one task are documented workflows, not executed fresh-agent scenarios. The validator checks report structure, not whether its claims are true.

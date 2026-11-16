@@ -50,7 +50,7 @@ Define before applying, and treat an unvalidated proposal as a hypothesis:
 
 ## Outcome summaries and metrics
 
-Outcome summaries are opt-in, local, and versioned (`schema_version`, `factory_version`, project, task, base, final revision, worktree state, environment, outcome, verification, review, duration, cost, lesson). See the v4 spec, "Outcome summaries and metrics".
+Outcome summaries are opt-in per task or once per project, local, and versioned (`schema_version`, `factory_version`, project, task, base, final revision, worktree state, environment, outcome, verification, review, duration, cost, lesson). See `task-summary.md` for the current schema, project setting and later review procedure. Reports distinguish check results, review independence, merge/deploy/live status, blockers and rework. Schema 1 remains readable; new reports use schema 2.
 
 - Default location: outside the public repository; user-controlled access, retention, and deletion decided before enabling persistence.
 - No default upload, background service, or automatic collection. Credentials, full prompts, private diffs, and unrelated transcripts are never stored by default.
