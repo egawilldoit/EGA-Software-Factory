@@ -4,6 +4,11 @@ Dedicated scenarios for opt-in local task summaries. All data is synthetic; no
 real task, prompt, cost, or credential data is used. The runner writes only to
 a temporary directory and makes no network connections.
 
+Requires `python3` for the destination and schema checks and PyYAML
+(`import yaml`) for `validate-summary.sh`; without PyYAML the validator reports
+`YAML parser unavailable` and fails closed. All data is synthetic and the run
+writes only to a temporary directory.
+
 Run:
 
 ```sh
@@ -24,8 +29,12 @@ bash tests/scenarios/summary/validate-summary.sh <summary.yaml>
 | S2 | Default/opt-out: no summary requested | No summary file in the workspace; an existing synthetic summary in the isolated test home stays unchanged | Synthetic fixture |
 | S3 | Unknown duration/cost | Recorded as `null`, never `0` or an estimate; a fixture with unmeasured `cost: 0` fails validation | 3/3 pass |
 | S4 | A secret-bearing key and a separate credential-shaped value in an allowed field | Validation rejects each for its respective reason; opt-in summary has no prompt/transcript-like fields | Synthetic fixtures |
+| S4d | Synthetic credential plus its surrounding line | Rejected without the credential or line appearing in stdout/stderr | 1/1 pass |
+| S4e | Malformed or duplicate YAML (`outcome: bogus`, `cost: 999`, `"prompt": hidden`, unterminated flow sequence) | Each payload is rejected | 4/4 pass |
 | S5 | Network behavior | Test scripts contain no network-capable commands | 1/1 pass (limited — see below) |
 | S6 | Whole run | No files created inside the repository during the run | 1/1 pass |
+
+Current result on `openclaw` (2026-11-16): 19 passed, 0 failed.
 
 The runner also tests HOME/XDG precedence, explicit destinations, canonical containment, and symlink escapes using a synthetic model of the documented path contract.
 

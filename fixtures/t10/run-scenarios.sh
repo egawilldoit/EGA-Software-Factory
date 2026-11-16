@@ -105,6 +105,9 @@ deliver "$d" --rules "$d/rules.txt" --boundary local --report "$d/report.json" >
 check "host actions total" "0" "$(grep -c '"action":' "$LOG" || true)"
 check "unrelated dirty file preserved" "unrelated.txt" "$(git -C "$d" status --porcelain | grep -o 'unrelated.txt' | head -1)"
 check "report written" "delivered" "$(jq -r .status "$d/report.json")"
+check "first performed action retained" "report:local" "$(jq -r '.performed[0]' "$d/report.json")"
+check "empty refusal array" "[]" "$(jq -c '.refused' "$d/report.json")"
+check "common mock disclaimer retained" "push/PR/CI/merge/deploy executed against the mock host shim; no real provider was contacted" "$(jq -r '.unverified[0]' "$d/report.json")"
 check "report dirty file count" "1" "$(jq -r .dirty_files "$d/report.json")"
 check "unchanged final revision" "$(git -C "$d" rev-parse HEAD)" "$(jq -r .final_revision "$d/report.json")"
 show_observed "$d"
@@ -134,6 +137,16 @@ echo "S3 review boundary (handoff report only):"
 start_scenario s3 "$rules_github_merge_deploy_ci"
 d="$FIXTURE_DIR"
 deliver "$d" --rules "$d/rules.txt" --boundary review --report "$d/report.json" > "$WORK/s3.out"
+if deliver "$d" --rules "$d/rules.txt" --boundary review --report "$WORK/missing/report.json" > "$WORK/report-fail.out" 2>&1; then
+  check "unwritable report fails" "failure" "success"
+else
+  check "unwritable report fails" "failure" "failure"
+fi
+if grep -q 'delivered at' "$WORK/report-fail.out"; then
+  check "unwritable report has no success message" "no" "yes"
+else
+  check "unwritable report has no success message" "no" "no"
+fi
 check "host actions total" "0" "$(grep -c '"action":' "$LOG" || true)"
 check "unrelated dirty file preserved" "unrelated.txt" "$(git -C "$d" status --porcelain | grep -o 'unrelated.txt' | head -1)"
 check "no push performed" "0" "$(count_action push)"
@@ -164,6 +177,8 @@ check "exit status refused" "3" "$?"
 check "no merge performed" "0" "$(count_action merge)"
 check "no ci-status performed" "0" "$(count_action ci-status)"
 check "refusal names authorization" "1" "$(grep -c 'without explicit user authorization' "$WORK/s5.err")"
+check "empty performed array" "[]" "$(jq -c '.performed' "$d/report.json")"
+check "sole refusal reason retained" "merge requested without explicit user authorization (PR creation does not imply merge)" "$(jq -r '.refused | if length == 1 then .[0] else empty end' "$d/report.json")"
 check "report status refused" "refused" "$(jq -r .status "$d/report.json")"
 show_observed "$d"
 
@@ -177,6 +192,13 @@ check "exit status refused" "3" "$?"
 check "no merge performed" "0" "$(count_action merge)"
 check "refusal names project rules" "1" "$(grep -c 'project rules set merge: blocked' "$WORK/s6.err")"
 show_observed "$d"
+
+# Exercise JSON escaping in an actual refusal reason, including a control character.
+escaped_rule=$'blocked "quoted" \\path\tend'
+printf 'merge: %s\n' "$escaped_rule" > "$d/escape-rules.txt"
+deliver "$d" --rules "$d/escape-rules.txt" --boundary merge --authorized-merge --report "$d/escape-report.json" > "$WORK/escape.out" 2> "$WORK/escape.err"
+check "escaped refusal status" "3" "$?"
+check "escaped refusal round trips" "true" "$(jq -r --arg reason "explicit authorization present, but project rules set merge: $escaped_rule" '.refused == [$reason]' "$d/escape-report.json")"
 
 # --- S7: authorized merge follows project rules incl. CI --------------------
 

@@ -33,6 +33,7 @@ Output:
 - Acceptance criteria must be observable and tied to evidence, including negative criteria when risk warrants.
 - Slices must leave the system working and be independently verifiable; omit them for trivial work.
 - Ask only consequential questions; resolve routine choices autonomously and record assumptions.
+- For takeover/ modernization work, resolve the actual head and later corrections first and check whether the goal is already superseded before planning a rebase; see `../../references/takeover-and-modernize.md`.
 
 ## Fallback
 
@@ -43,3 +44,4 @@ When the skill cannot be invoked, return a compact plan with the same sections a
 - `../../references/planning.md`
 - `../../references/risk-and-delivery.md`
 - `../../references/verification-and-review.md`
+- `../../references/takeover-and-modernize.md` (when planning takeover/modernize work)

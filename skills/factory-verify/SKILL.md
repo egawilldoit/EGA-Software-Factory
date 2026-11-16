@@ -50,9 +50,15 @@ Per criterion, record one of:
 - Do not claim full verification when mandatory evidence is missing.
 - If `factory-verify` is unavailable, `factory` performs a minimal evidence pass and labels it `verification: fallback-inline`.
 
+## Completion
+
+Once scoped checks and final review pass, proceed to the authorized delivery boundary. Additional tests or reviews need a concrete finding, changed requirement or invalidated evidence. Distinguish required checks and concrete technical blockers from optional improvements; focus on resolving the actual blocker. See `../../references/verification-and-review.md` for completion and blocker handling.
+
 ## Review
 
 Separately assess: requested behavior, omitted requirements, unintended changes, error handling, security, architecture, maintainability, and test coverage. Report limitations honestly. Disclose whether the reviewer is independent of the implementer. Green checks do not authorize production operations or make destructive actions reversible.
+
+Keep the final review bounded: one reviewer, a respected user-chosen model, no forced Sol/council or automatic fan-out. Record findings with evidence, severity and disposition; make scoped fixes, rerun affected checks, and stop at optional nits. See `../../references/verification-and-review.md`.
 
 ## Scenario verification (T06)
 

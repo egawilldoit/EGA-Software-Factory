@@ -1,54 +1,51 @@
 #!/usr/bin/env bash
-# Validates a synthetic EGA Software Factory task summary against the T09 rules.
-# Usage: validate-summary.sh <summary.yaml>
-# Local file checks only; performs no network access.
 set -u
-
-[ "$#" -eq 1 ] && [ -f "$1" ] || { echo "FAIL: usage: validate-summary.sh <summary.yaml>" >&2; exit 1; }
-file="$1"
-fail() { echo "FAIL: $1" >&2; exit 1; }
-
-# 1. schema_version must be 1.
-grep -Eq '^schema_version:[[:space:]]*1[[:space:]]*$' "$file" \
-  || fail "schema_version must be 1"
-
-# 2. Only known top-level keys are allowed.
-allowed=" schema_version factory_version project task base final_revision worktree_state environment outcome verification review duration cost lesson "
-keys=$(grep -Eo '^[a-z_]+:' "$file" | tr -d ':' | sort -u)
-[ -n "$keys" ] || fail "no top-level keys found"
-while IFS= read -r k; do
-  case "$allowed" in *" $k "*) ;; *) fail "unknown top-level key: $k";; esac
-done <<< "$keys"
-
-# 3. Required keys present with non-empty values.
-for key in factory_version project task base final_revision worktree_state environment outcome verification review; do
-  grep -Eq "^${key}:[[:space:]]*[^[:space:]#]" "$file" || fail "missing/empty required key: $key"
-done
-
-# 4. Controlled vocabularies.
-grep -Eq '^outcome:[[:space:]]*"?(completed|ready-for-review|blocked|unknown)"?[[:space:]]*(#.*)?$' "$file" \
-  || fail "outcome must be completed, ready-for-review, blocked, or unknown"
-grep -Eq '^worktree_state:[[:space:]]*"?(clean|dirty|unknown)"?[[:space:]]*(#.*)?$' "$file" \
-  || fail "worktree_state must be clean, dirty, or unknown"
-
-# 5. Unknown metrics must be null; a real value needs a '# measured' source note.
-for key in duration cost; do
-  grep -Eq "^${key}:" "$file" || fail "metrics key missing (use null when unknown): $key"
-  if ! grep -Eq "^${key}:[[:space:]]*null[[:space:]]*(#.*)?$" "$file"; then
-    grep -Eq "^${key}:.*#[[:space:]]*measured" "$file" \
-      || fail "$key must be null when unknown; a real value requires a '# measured' source note (never zero or an estimate)"
-  fi
-done
-
-# 6. No credential-like content.
-if grep -En '(ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY)' "$file"; then
-  fail "credential-like pattern found"
+[ "$#" -eq 1 ] && [ -f "$1" ] || { echo 'FAIL: usage: validate-summary.sh <summary.yaml>' >&2; exit 1; }
+if grep -Eq '(ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY)' "$1"; then
+  echo 'FAIL: credential-like pattern found' >&2; exit 1
 fi
-grep -Eqi '^[[:space:]]*(api[_-]?key|apikey|password|passwd|secret|token|authorization):' "$file" \
-  && fail "secret-bearing key found"
-
-# 7. No prompt/transcript capture fields.
-grep -Eqi '^[[:space:]]*(prompt|transcript|trace|conversation|messages|full[-_]?log)[[:space:]]*:' "$file" \
-  && fail "prompt/transcript-like field found; not permitted by the privacy rules"
-
-echo "OK: $file"
+python3 - "$1" <<'PY'
+import re, sys
+try:
+    import yaml
+except ImportError:
+    print('FAIL: YAML parser unavailable (PyYAML required)', file=sys.stderr); sys.exit(1)
+class Loader(yaml.SafeLoader):
+    pass
+def mapping(loader, node):
+    result = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node)
+        if not isinstance(key, str) or key in result:
+            raise ValueError('invalid or duplicate key')
+        result[key] = loader.construct_object(value_node)
+    return result
+Loader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, mapping)
+try:
+    text = open(sys.argv[1], encoding='utf-8').read()
+    data = yaml.load(text, Loader=Loader)
+    if not isinstance(data, dict): raise ValueError('mapping required')
+    allowed = set('schema_version factory_version project task base final_revision worktree_state environment outcome verification review duration cost lesson'.split())
+    prohibited = re.compile(r'^(api[_-]?key|apikey|password|passwd|secret|token|authorization|prompt|transcript|trace|conversation|messages|full[-_]?log)$', re.I)
+    def inspect(value):
+        if isinstance(value, dict):
+            for k, v in value.items():
+                if prohibited.fullmatch(k): raise ValueError('prohibited key')
+                inspect(v)
+        elif isinstance(value, list):
+            for v in value: inspect(v)
+    inspect(data)
+    if set(data) - allowed: raise ValueError('unknown key')
+    if type(data.get('schema_version')) is not int or data['schema_version'] != 1: raise ValueError('schema version')
+    for key in 'factory_version project task base final_revision worktree_state environment outcome verification review'.split():
+        if not isinstance(data.get(key), str) or not data[key].strip(): raise ValueError('required string')
+    if data['outcome'] not in ('completed','ready-for-review','blocked','unknown') or data['worktree_state'] not in ('clean','dirty','unknown'): raise ValueError('invalid value')
+    if 'lesson' in data and (not isinstance(data['lesson'], str) or not data['lesson'].strip()): raise ValueError('invalid lesson')
+    for key in ('duration', 'cost'):
+        if key not in data: raise ValueError('missing metric')
+        if data[key] is not None:
+            if type(data[key]) not in (int, float) or data[key] < 0 or not re.search(r'^'+key+r':[^\n]*#\s*measured\b', text, re.M): raise ValueError('invalid metric')
+except (Exception,) as exc:
+    print('FAIL: invalid summary', file=sys.stderr); sys.exit(1)
+print('OK: summary valid')
+PY

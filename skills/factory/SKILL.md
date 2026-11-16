@@ -16,7 +16,13 @@ Record, without mutating:
 - Available capabilities and their compatibility (skills, tools, tests, browser, host).
 - User/project/model preferences and authorization boundaries.
 
+Before implementation, identify the acceptance evidence needed to demonstrate the requested behavior. Before delivery, perform proportionate final behavior verification and a separate code review pass; disclose unavailable evidence and limitations. Label same-agent review honestly.
+
 Read-only requests must produce no edits, commits, publication, push, merge, or deployment.
+
+Keep a concise working understanding of authorized actions, exclusions, required conditions and their sources; no new tracking file is required. Update it from later user instructions and pass the current scope to delegates. Reuse authorization while its scope remains applicable. Resolve a changed instruction against earlier conditions; ask one specific question only if a consequential conflict remains ambiguous.
+
+Inspect automatic delivery effects early (for example, merge triggering production deployment). Interpret the requested outcome together with those effects using `../../references/risk-and-delivery.md`. Separate permission to act from readiness to execute.
 
 ## 2. Route proportionately
 
@@ -25,9 +31,11 @@ Choose only the work that the request and risk require:
 | Situation | Route |
 | --- | --- |
 | Need resolve consequential uncertainty | `factory-plan` |
+| Take over or modernize existing PR/branch/thread | `../../references/takeover-and-modernize.md` |
 | Need implementation/investigation | implement directly or with an explicitly permitted delegate |
-| Need evidence of behavior | `factory-verify` |
-| Need separate final review | `factory-verify` review pass |
+| Final behavior verification | `factory-verify` |
+| Separate final code review | `factory-verify` review pass (bounded: one reviewer) |
+| File, monitor, or hand off a PR/MR | `../../references/pr-workflows.md` |
 | Web/UI/accessibility work | relevant available web guidance plus `factory-verify` |
 | Repeated failures or process improvement | `factory-improve` |
 | Delivery requested | deliver at the exact authorized boundary |
@@ -58,14 +66,28 @@ Examples are snapshots, not guarantees: Matt implement may commit; Matt to-spec 
 
 Delegate only when requested or allowed, genuinely useful, and supported. Never claim fresh-context independent review when the same agent performed it. Same-agent review must be labeled as same-agent.
 
-## 6. References
+## 6. Critical obligations
+
+Keep these visible regardless of route; details live in the linked references.
+
+- **Takeover/modernize:** recover the actual head and later corrections, preserve authorship and unrelated work, check whether the goal is superseded; never auto-replace/close a PR or rewrite a branch without authorization. Modernize intent, not just a mechanical rebase.
+- **File PR:** check for an existing PR, review the scoped diff, keep the description problem/solution/evidence focused, and check for secrets and private details while preserving contributor credit.
+- **Babysit PR:** watch only when requested or needed to complete the authorized finish; otherwise hand off with current status. Use the host's supported watcher only (one per PR); only the owning thread watches, delegated children never watch, and no custom polling. Verify findings before fixing, reject unrelated scope creep, honor actual required checks/reviews, and separate finishing work from watching and handoff.
+- **Bounded review:** one reviewer, chosen model respected; no forced Sol, council, or automatic fan-out. Findings carry evidence, severity and disposition; make scoped fixes, rerun affected checks, and stop at optional nits. No mandatory extra cycle after a docs-only change.
+- **Delivery outcomes:** permission is separate from readiness. Assess automatic effects early; never infer blanket production authorization from silence. Later instructions update scope, but host/tool restrictions still apply.
+- **No-merge / PR-ready:** apply only when the user clearly requests that outcome. A plain "stop"/"pause"/"full stop" means stop — begin no new edits, pushes, review rounds or watchers. When authorized, preserve the no-merge boundary; do not inherit automatic disabling of auto-merge/queue settings without authorization. Resolve conflicting automation before pushing rather than silently changing settings.
+- **Council:** optional and user-requested only; no unbounded rounds or score gates.
+
+## 7. References
 
 Paths below are relative to this skill file; load only the references relevant to the task.
 
 - `../../references/workflow.md`
 - `../../references/skill-compatibility.md`
-- `../../references/verification-and-review.md`
-- `../../references/risk-and-delivery.md`
+- `../../references/verification-and-review.md` (bounded review, optional council, completion)
+- `../../references/risk-and-delivery.md` (boundaries, authorization, automatic effects)
+- `../../references/pr-workflows.md`
+- `../../references/takeover-and-modernize.md`
 - `../../references/web-guidance.md`
 - `../../references/improvement-and-metrics.md`
 - `../../references/planning.md`

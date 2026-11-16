@@ -25,6 +25,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOST="${T10_DELIVERY_HOST:-$SCRIPT_DIR/mock-delivery-host.sh}"
 
 BOUNDARY="" REPO="" RULES="" REPORT="" COMMIT_MSG="" PR_TITLE=""
+# Fixture inputs representing authorization that already exists from the user's
+# requested outcome. They are not a second user approval request and grant
+# nothing on their own; they only select the authorized branch of a scenario.
 AUTH_MERGE=0 AUTH_DEPLOY=0
 
 usage() {
@@ -81,21 +84,16 @@ host() { # prints "[MOCK] ..." lines then "ok key=value"
 }
 
 json_list() { # items -> ["a","b"]
-  local items=("${@:2}") out="[" i
-  for i in "${!items[@]}"; do
-    [ "$i" -eq 0 ] || out+=","
-    out+="\"${items[$i]}\""
-  done
-  printf '%s]' "$out"
+  jq -cn --args '$ARGS.positional' "$@"
 }
 
 write_report() { # status
   local status="$1"
   local performed_json refused_json unverified_json final_rev
   final_rev="$(git -C "$REPO" rev-parse HEAD)" || return 1
-  performed_json="$(json_list "${performed[@]}")"
-  refused_json="$(json_list "${refused[@]}")"
-  unverified_json="$(json_list "${unverified[@]}")"
+  performed_json="$(json_list "${performed[@]}")" || return 1
+  refused_json="$(json_list "${refused[@]}")" || return 1
+  unverified_json="$(json_list "${unverified[@]}")" || return 1
   [ -n "$REPORT" ] || return 0
   printf '{"schema":"t10-delivery-report/1","mock_host":true,"status":"%s","boundary":"%s","provider":"%s","base_revision":"%s","final_revision":"%s","branch":"%s","dirty_files":%s,"performed":%s,"refused":%s,"unverified":%s}\n' \
     "$status" "$BOUNDARY" "$provider" "$base_rev" "$final_rev" "$branch" "${dirty_files:-0}" \
@@ -120,14 +118,14 @@ case "$BOUNDARY" in
       fi
     fi
     performed+=("report:local")
-    write_report delivered
+    write_report delivered || { echo "ERROR: report write failed" >&2; exit 1; }
     echo "delivered at local boundary; external writes: none"
     ;;
 
   review)
     performed+=("report:review-handoff")
     unverified+=("review-handoff file is produced locally; no review request was sent to any provider")
-    write_report delivered
+    write_report delivered || { echo "ERROR: report write failed" >&2; exit 1; }
     echo "delivered at review boundary; external writes: none"
     ;;
 
@@ -143,7 +141,7 @@ case "$BOUNDARY" in
     performed+=("host:$pr_cmd:$pr_ref")
     unverified+=("PR/MR number $pr_ref is simulated by the mock host; it does not exist on any provider")
     performed+=("report:pr-delivery")
-    write_report delivered
+    write_report delivered || { echo "ERROR: report write failed" >&2; exit 1; }
     echo "delivered at pr boundary: $pr_cmd $pr_ref; merge and deploy NOT performed"
     ;;
 
@@ -162,7 +160,7 @@ case "$BOUNDARY" in
     out="$(host merge "$REPO" "$branch" "$default_branch")" || refuse "host merge failed: $out"
     performed+=("host:merge:$branch->$default_branch")
     performed+=("report:merge-delivery")
-    write_report delivered
+    write_report delivered || { echo "ERROR: report write failed" >&2; exit 1; }
     echo "delivered at merge boundary: merged into $default_branch; deploy NOT performed"
     ;;
 
@@ -172,7 +170,7 @@ case "$BOUNDARY" in
     out="$(host deploy "$REPO" "$branch" "${T10_DEPLOY_TARGET:-staging}")" || refuse "host deploy failed: $out"
     performed+=("host:deploy:$branch")
     performed+=("report:deploy-delivery")
-    write_report delivered
+    write_report delivered || { echo "ERROR: report write failed" >&2; exit 1; }
     echo "delivered at deploy boundary; merge NOT performed"
     ;;
 esac

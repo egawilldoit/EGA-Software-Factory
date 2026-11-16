@@ -14,9 +14,10 @@ production target is touched by any scenario.
 - `delivery.sh` — reference implementation of the delivery boundary ladder
   (`local`, `review`, `pr`, `merge`, `deploy`). Enforces: read-only/local means
   zero external writes; PR creation never implies merge; merge/deploy require
-  explicit user authorization **and** permission in the project's rules file;
-  merge does not imply deploy. Writes a JSON delivery report including the mock
-  disclosure and unverified steps.
+  authorization covering their effects **and** permission in the project's
+  rules file; merge does not imply deploy. Writes a JSON delivery report
+  including the mock disclosure and unverified steps. Requires `jq` for report
+  serialization; no network access.
 - `mock-delivery-host.sh` — the MOCK host shim. Records each requested external
   action to `$T10_ACTION_LOG` as one JSON line and prints a simulated result.
 - `run-scenarios.sh` — creates isolated temporary git fixtures under
@@ -31,6 +32,16 @@ Scenarios pass a small rules file representing the project's actual delivery
 rules (`KEY: VALUE` lines): `provider`, `default-branch`, `merge: allowed|blocked`,
 `deploy: allowed|blocked`, `require-ci: true|false`. The workflow follows these
 rules; it invents no additional approval gates and skips none of them.
+
+## Authorization flags
+
+The `--authorized-merge` and `--authorized-deploy` flags are fixture inputs
+that represent authorization the user has already given through the requested
+outcome. They are **not** a second user approval request and do not grant
+authorization on their own: without the flag, the boundary is refused even when
+the rules allow it. A real session establishes authorization from the user's
+stated goal and later instructions, not from a flag. The flags exist so the
+scenarios can test the authorized and unauthorized branches deterministically.
 
 ## Scenarios (S1–S9)
 
@@ -49,7 +60,7 @@ rules; it invents no additional approval gates and skips none of them.
 Run:
 
 ```sh
-fixtures/t10/run-scenarios.sh        # 42 checks; exits non-zero on any failure
+fixtures/t10/run-scenarios.sh        # 55 checks; exits non-zero on any failure
 fixtures/t10/run-scenarios.sh --keep # keep /tmp/opencode fixture dir for inspection
 ```
 
@@ -58,7 +69,10 @@ fixtures/t10/run-scenarios.sh --keep # keep /tmp/opencode fixture dir for inspec
 - Real provider behavior (actual GitHub/GitLab push, PR/MR creation, real CI,
   real merges, real deployments) is **not exercised** by these fixtures and
   remains unverified; delivery against a real provider still needs an
-  authorized target.
+  authorized target. In particular, these scenarios keep `merge` and `deploy`
+  as separate boundaries: they do **not** test a real provider's automatic
+  deployment triggered by a merge, so real automatic effects remain unverified
+  even though the fixture demonstrates the two authorization decisions.
 - `delivery.sh` is a test-harness reference for the documented procedure, not
   an executable the plugin installs; a Codex session follows the same rules as
   guidance rather than by running this script.

@@ -81,6 +81,31 @@ else
   check $? "S4c credential pattern in an allowed field is rejected"
 fi
 
+# Synthetic sentinel verifies neither the credential nor its surrounding line leaks.
+synthetic_credential="ghp_$(printf 'X%.0s' {1..24})"
+synthetic_line="task: \"synthetic-line-marker $synthetic_credential\""
+cp "$here/fixtures/opt-in-synthetic.yaml" "$data_root/credential-sentinel.yaml"
+printf '%s\n' "$synthetic_line" >> "$data_root/credential-sentinel.yaml"
+if bash "$here/validate-summary.sh" "$data_root/credential-sentinel.yaml" >"$data_root/sentinel.stdout" 2>"$data_root/sentinel.stderr"; then
+  check 1 "S4d synthetic credential is rejected without output disclosure"
+elif grep -q 'credential-like pattern found' "$data_root/sentinel.stderr" &&
+     ! grep -Fq "$synthetic_credential" "$data_root/sentinel.stdout" "$data_root/sentinel.stderr" &&
+     ! grep -Fq 'synthetic-line-marker' "$data_root/sentinel.stdout" "$data_root/sentinel.stderr"; then
+  check 0 "S4d synthetic credential is rejected without output disclosure"
+else
+  check 1 "S4d synthetic credential is rejected without output disclosure"
+fi
+
+for payload in 'outcome: bogus' 'cost: 999' '"prompt": hidden' 'broken: [unterminated'; do
+  cp "$here/fixtures/opt-in-synthetic.yaml" "$data_root/negative.yaml"
+  printf '%s\n' "$payload" >> "$data_root/negative.yaml"
+  if bash "$here/validate-summary.sh" "$data_root/negative.yaml" > /dev/null 2>&1; then
+    check 1 "reject malformed or duplicate YAML: $payload"
+  else
+    check 0 "reject malformed or duplicate YAML: $payload"
+  fi
+done
+
 python3 "$here/test-destinations.py"
 check $? "destination precedence and boundary checks"
 
