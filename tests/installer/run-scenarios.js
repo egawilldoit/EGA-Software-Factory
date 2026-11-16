@@ -356,6 +356,56 @@ check('symlinked managed path refuses install without touching external target',
   eq(fs.readFileSync(outsideFile, 'utf8'), 'EXTERNAL_UNCHANGED\n', 'external file untouched');
 });
 
+check('update, rollback and recovery preserve unsafe or unowned new paths', () => {
+  const expanded = path.join(work, 'expanded-package');
+  fs.cpSync(pkgRoot, expanded, { recursive: true });
+  const rel = 'references/extra/guide.md';
+  const body = 'EXTRA_GUIDANCE\n';
+  const file = path.join(expanded, 'bundle', 'files', rel);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, body);
+  const descriptorPath = path.join(expanded, 'bundle', 'bundle.json');
+  const descriptor = JSON.parse(fs.readFileSync(descriptorPath, 'utf8'));
+  descriptor.version = '3.0.0';
+  descriptor.files.push({ path: rel, sha256: sha(Buffer.from(body)), bytes: Buffer.byteLength(body) });
+  fs.writeFileSync(descriptorPath, JSON.stringify(descriptor));
+  const packagePath = path.join(expanded, 'package.json');
+  const metadata = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+  metadata.version = '3.0.0';
+  fs.writeFileSync(packagePath, JSON.stringify(metadata));
+
+  for (const kind of ['symlink', 'file']) for (const operation of ['update', 'rollback', 'recovery']) {
+    const home = freshHome('home-new-path-' + kind + '-' + operation);
+    const outside = path.join(work, 'outside-new-path-' + kind + '-' + operation);
+    fs.mkdirSync(outside);
+    if (operation === 'update') {
+      eq(callFactory(pkgRoot, home, ['install']).status, 0, 'install base');
+    } else {
+      eq(callFactory(expanded, home, ['install']).status, 0, 'install expanded');
+      eq(callFactory(pkg2, home, ['update']).status, 0, 'update without extra path');
+      fs.rmSync(installed(home, 'references/extra'), { recursive: true, force: true });
+      if (operation === 'recovery') {
+        fs.unlinkSync(installed(home, 'references/workflow.md'));
+        writeLock(home, 2147483647);
+      }
+    }
+    if (kind === 'symlink') fs.symlinkSync(outside, installed(home, 'references/extra'), 'dir');
+    else {
+      fs.mkdirSync(installed(home, 'references/extra'), { recursive: true });
+      fs.writeFileSync(installed(home, rel), 'USER_CONTENT\n');
+    }
+    const manifestBefore = fs.readFileSync(installed(home, '.ega-factory/manifest.json'), 'utf8');
+    const result = callFactory(operation === 'update' ? expanded : pkg2, home,
+      [operation === 'rollback' ? 'rollback' : 'update']);
+    ok(result.status !== 0, operation + ' refuses unsafe target');
+    if (kind === 'symlink') ok(result.report.error.includes('symbolic link'), operation + ' explains boundary');
+    else eq(fs.readFileSync(installed(home, rel), 'utf8'), 'USER_CONTENT\n', operation + ' preserves unowned bytes');
+    eq(fs.readdirSync(outside).length, 0, operation + ' leaves outside untouched');
+    eq(fs.readFileSync(installed(home, '.ega-factory/manifest.json'), 'utf8'), manifestBefore,
+      operation + ' preserves committed manifest');
+  }
+});
+
 check('symlinked metadata directory refuses install without writes', () => {
   const home = freshHome('home-symlink-meta');
   const outside = path.join(work, 'outside-meta');
