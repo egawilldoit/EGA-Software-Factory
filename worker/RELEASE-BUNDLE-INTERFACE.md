@@ -63,6 +63,6 @@ Four references link to both docs: `verification-and-review`, `risk-and-delivery
 
 ## Notes for the adapter
 
-- `worker/generated/released-guidance.json` is currently a development placeholder (`0.0.0-dev`, `sourceCommit: unreleased`). Replace it with the canonical adapter output before deployment.
+- `npm run build` generates `worker/generated/released-guidance.json` from the canonical bundle. Release deployment rejects development placeholders and mismatched source identity.
 - `worker/fixtures/sample-release-bundle.json` is test-only. Its two-release variant in the tests is constructed inline, never deployed.
 - No environment variables or secrets are read. No file paths, URLs, shell commands or repository data are accepted from tool arguments; only `id` and `version` are, and both are validated.

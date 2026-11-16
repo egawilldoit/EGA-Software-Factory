@@ -1,6 +1,6 @@
 # V1 shipping plan
 
-Status: implementation authorized on 2026-11-16, shipping evidence pending. This is the plan for the first portable shipping release, not a claim that version 1.0.0 has shipped. The existing v4 document describes the workflow design; v1.0.0 will identify the distributed product.
+Status: v1.0.1 published on 2026-11-16. The installer, release automation and read-only Cloudflare channel are implemented. See [observed release evidence](v1-release-evidence.md) for checks and remaining limits. The existing v4 document describes the workflow design.
 
 ## Outcome
 
@@ -78,7 +78,7 @@ Gate: test actual tool discovery and retrieval with a protocol client, invalid I
 
 ### 4. User handoff
 
-Replace checkout-specific setup as the primary README path with the tested installer commands. Provide one short local example and one ChatGPT connection example, supported-host evidence, update/rollback steps and troubleshooting. Retain contributor/local-marketplace instructions separately.
+Replace checkout-specific setup as the primary README path with the tested installer commands. Provide one short local example, the hosted endpoint, supported-host evidence, update/rollback steps and troubleshooting. ChatGPT connection instructions remain deferred until account compatibility is tested. Retain contributor/local-marketplace instructions separately.
 
 Gate: from a clean supported environment, a user can install, invoke `factory`, identify its version, update, diagnose and roll back without editing paths manually. Run one small real task with the released artifact and record observed behavior; remaining factory scenarios stay not checked until exercised.
 

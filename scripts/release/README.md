@@ -1,8 +1,7 @@
 # Release automation
 
-Status: implemented, not exercised. The installer/package scripts and the
-canonical bundle adapter are owned by another agent and are not finished, so
-`prepare` fails closed rather than claim a passing release.
+V1.0.1 completed the tagged release workflow on 2026-11-16. See the
+[observed release evidence](../../docs/v1-release-evidence.md).
 
 Flow on a stable `vX.Y.Z` tag push:
 `prepare` (version check → **build canonical bundle at HEAD** → metadata parity
@@ -25,7 +24,7 @@ records only what was actually observed: `published` / `skipped-identical` /
 version/commit). `summary` prints those records; it never claims a deployment
 that was not confirmed. A dry run records `not-run`.
 
-## Interfaces to wire
+## Release configuration
 
 - `BUILD_CMD` (default `npm run build`) — generate the canonical bundle at the
   release source commit: `bundle/bundle.json` (schemaVersion 1, `version`,
@@ -33,11 +32,11 @@ that was not confirmed. A dry run records `not-run`.
   `worker/generated/released-guidance.json` (`defaultVersion`, release
   `sourceCommit` = `git rev-parse HEAD`, real `generator`). `prepare` and
   `deploy-cf` both assert version/sourceCommit parity and reject the development
-  placeholder. The root `package.json` declares no scripts yet, so this needs
-  wiring or overriding. **Including the previous stable release in the worker
-  bundle is parent wiring; this component only asserts current-release parity.**
+  placeholder. Root scripts build both outputs. `previous.mjs` retrieves and
+  integrity-checks the previous stable npm package; the Worker adapter includes
+  it through `PREVIOUS_PACKAGE_ROOT`.
 - `TEST_CMD` (default `npm run test:package`) — package/installer fixture tests,
-  unknown until the installer finishes. `prepare` also runs the worker's
+  covering install, update, rollback, recovery and filesystem safety. `prepare` also runs the worker's
   dependency-free `npm test`.
 - `CF_DEPLOY_CMD` (default empty) — optional single hook replacing only the
   module upload; it runs in `worker/` with `WORKER_MODULE`, `RELEASE_TARBALL`,
@@ -59,7 +58,6 @@ Artifact, identity record and status go to `$RELEASE_OUT` (default
 
 Commands: `verify | prepare | pack | publish-npm | release-github | deploy-cf | summary`.
 
-Static checks run here: `bash -n`, YAML parse, `release.sh verify`. No real
-build, test, tag, release, publish, Cloudflare write or deploy was performed;
-the bundle/test adapter, previous-release support and CF upload must be exercised
-end to end before the final release.
+The tagged v1.0.1 workflow exercised build, tests, npm publication, GitHub
+release creation and Cloudflare deployment. See the release evidence above for
+exact revisions, checks and limitations.

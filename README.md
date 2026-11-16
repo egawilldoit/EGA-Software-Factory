@@ -2,7 +2,7 @@
 
 Four agent skills for planning, implementing, verifying and reviewing one software outcome. The host supplies models, tools and permissions.
 
-V1 distribution is being verified. The workflow design is v4; the portable package is v1.0.1. ChatGPT connection testing is deferred.
+V1.0.1 is published on npm and GitHub, with read-only guidance live on Cloudflare. The workflow design is v4. See [release evidence](docs/v1-release-evidence.md) for tested hosts and remaining gaps.
 
 ## Install and use
 
@@ -35,7 +35,7 @@ Local installs remain pinned until updated. The installer preserves unrelated sk
 
 The Cloudflare MCP channel supplies public released instructions only. It cannot access your repositories, execute work or change production. Its stable URL advances on a stable tagged release. Start by reading the version, then include that version in subsequent retrieval calls to avoid mixing releases.
 
-ChatGPT custom MCP connection testing is deferred. No ChatGPT compatibility is claimed yet. The endpoint will be `https://ega-software-factory.a2003-2015.workers.dev/mcp`; deployment and protocol evidence will be recorded after verification.
+ChatGPT custom MCP connection testing is deferred. No ChatGPT compatibility is claimed yet. The live endpoint is `https://ega-software-factory.a2003-2015.workers.dev/mcp`. Tool discovery, current/previous retrieval and content parity passed with the official MCP SDK.
 
 ## Release and contributor setup
 
