@@ -11,6 +11,7 @@ const { spawnSync } = require('child_process');
 const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '../..');
+const BASE_VERSION = require(path.join(ROOT, 'package.json')).version;
 const TMP_BASE = fs.existsSync('/tmp/opencode') ? '/tmp/opencode' : os.tmpdir();
 const work = fs.mkdtempSync(path.join(TMP_BASE, 'factory-package-test-'));
 
@@ -166,7 +167,7 @@ check('install lays out complete self-contained bundle; doctor is clean', () => 
   ok(fs.existsSync(installed(home, 'templates/task-summary.yaml')), 'missing template');
   ok(fs.existsSync(installed(home, 'docs/authorization-and-completion-scenarios.md')), 'missing authorization doc');
   ok(fs.existsSync(installed(home, 'docs/v4-acceptance-status.md')), 'missing status doc');
-  eq(manifestOf(home).version, '1.0.0', 'manifest version');
+  eq(manifestOf(home).version, BASE_VERSION, 'manifest version');
 
   const again = callFactory(pkgRoot, home, ['install']);
   eq(again.status, 0, 'repeat install exit'); ok(again.report.ok, 'repeat install ok');
@@ -220,7 +221,7 @@ check('local edits block update and are preserved unchanged', () => {
   const upd = callFactory(pkg2, home, ['update']);
   eq(upd.status, 2, 'update refuses local edits');
   ok(upd.report.error.includes('local edits'), 'refusal message');
-  eq(manifestOf(home).version, '1.0.0', 'version unchanged');
+  eq(manifestOf(home).version, BASE_VERSION, 'version unchanged');
   eq(fs.readFileSync(target, 'utf8'), before, 'local edit preserved');
 });
 
@@ -230,7 +231,7 @@ check('update stages and verifies, rollback swaps one previous bundle and back',
   const upd = callFactory(pkg2, home, ['update', '--host', 'opencode']);
   eq(upd.status, 0, 'update exit');
   ok(upd.report.ok, 'update ok');
-  eq(upd.report.installed, '1.0.0', 'installed shown');
+  eq(upd.report.installed, BASE_VERSION, 'installed shown');
   eq(upd.report.requested, '2.0.0', 'requested shown');
   eq(manifestOf(home).version, '2.0.0', 'manifest updated');
   ok(fs.readFileSync(installed(home, 'references/workflow.md'), 'utf8').includes('V2_MARKER'), 'v2 content present');
@@ -242,8 +243,8 @@ check('update stages and verifies, rollback swaps one previous bundle and back',
   const back = callFactory(pkg2, home, ['rollback']);
   eq(back.status, 0, 'rollback exit');
   eq(back.report.from, '2.0.0', 'rollback from');
-  eq(back.report.to, '1.0.0', 'rollback to');
-  eq(manifestOf(home).version, '1.0.0', 'manifest rolled back');
+  eq(back.report.to, BASE_VERSION, 'rollback to');
+  eq(manifestOf(home).version, BASE_VERSION, 'manifest rolled back');
   ok(!fs.readFileSync(installed(home, 'references/workflow.md'), 'utf8').includes('V2_MARKER'), 'v2 marker gone');
 
   const forwardAgain = callFactory(pkg2, home, ['rollback']);
@@ -280,7 +281,7 @@ check('recovery restores previous bundle after interrupted update with dead lock
   const upd = callFactory(pkg2, home, ['update']);
   eq(upd.status, 0, 'recovered update exit');
   eq(upd.report.recovery.action, 'restored-previous', 'restored previous action');
-  eq(upd.report.recovery.version, '1.0.0', 'restored version');
+  eq(upd.report.recovery.version, BASE_VERSION, 'restored version');
   eq(manifestOf(home).version, '2.0.0', 'update completed after recovery');
   ok(fs.readFileSync(installed(home, workflowRel), 'utf8').includes('V2_MARKER'), 'v2 content restored after recovery');
 });
@@ -308,7 +309,7 @@ check('a live lock owner is never cleared', () => {
   eq(res.status, 4, 'live lock refusal exit');
   ok(res.report.error.includes('holds the lock'), 'live lock message');
   ok(fs.existsSync(lockPath), 'active lock retained');
-  eq(manifestOf(home).version, '1.0.0', 'version unchanged');
+  eq(manifestOf(home).version, BASE_VERSION, 'version unchanged');
   fs.unlinkSync(lockPath);
 });
 
