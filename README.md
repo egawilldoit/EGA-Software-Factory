@@ -2,7 +2,7 @@
 
 Small Codex plugin that routes software work to proportional planning, verification, review, and improvement workflows. Ships four thin skills: factory, factory-plan, factory-verify, factory-improve.
 
-Status: v4 candidate. Real Codex host install/refresh/rollback observed on one Linux host (openclaw, Codex CLI 0.169.0, 2026-11-15) via a local marketplace. Real pilot issue not completed; full end-to-end readiness is not claimed.
+Status: v4 candidate. Real Codex host install/refresh/rollback observed on one Linux host (openclaw, Codex CLI 0.169.0, 2026-11-15) via a local marketplace. A scoped real-task pilot was run in this repo for T3 skill discovery and docs (2026-11-16; see `docs/pilot-t3-skill-discovery.md`). Full end-to-end readiness is not claimed.
 
 ## Supported host (tested)
 
@@ -45,6 +45,21 @@ $factory
 ```
 
 Also exposes $factory-plan, $factory-verify, $factory-improve. The instructions direct the agent to preserve read-only boundaries; the host enforces actual permissions.
+
+### Use in T3 / OpenCode
+
+The four skills are registered from this repo's `.opencode/opencode.json`, so no
+global install is needed. Open the repo in T3 and type `/skill:factory` (or pick
+**factory** from the skill menu); the other three load as `/skill:factory-plan`,
+`/skill:factory-verify`, and `/skill:factory-improve`. T3 reloads project config
+on save; run `/reload` in a fresh session if a skill is not listed yet.
+
+Example:
+
+```text
+/skill:factory
+Assess this repo and route a small documentation fix; keep it read-only.
+```
 
 ## Skills
 
@@ -111,7 +126,7 @@ Rollback requires preserved known-good source; Codex does not keep multiple vers
 - Refresh/rollback evidence: one local-host run, Codex CLI 0.169.0, 0.1.0 <-> 0.2.0, fresh-session invocation recorded (references/synchronization.md).
 - Web-specialist routing, component/accessibility, browser verification not exercised as real user flow (references/web-guidance.md).
 - No project-specific verification recipe exists yet (spec section 8).
-- Pilot (T13): not completed. No real issue executed; final integrated runtime behavior pending.
+- Pilot (T13): scoped real-task pilot observed in this repo for T3 skill discovery and docs (2026-11-16; see `docs/pilot-t3-skill-discovery.md`). Full integrated runtime behavior and the rest of T12 remain unverified.
 - A summary destination test initially wrote outside its authorized boundary; a single retest passed after guidance was changed, using a reconstructed prompt. Host sandbox and network telemetry remain unverified.
 - Git-marketplace upgrade behavior not exercised.
 

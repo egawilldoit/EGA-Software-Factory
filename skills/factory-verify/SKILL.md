@@ -58,7 +58,7 @@ Once scoped checks and final review pass, proceed to the authorized delivery bou
 
 Separately assess: requested behavior, omitted requirements, unintended changes, error handling, security, architecture, maintainability, and test coverage. Report limitations honestly. Disclose whether the reviewer is independent of the implementer. Green checks do not authorize production operations or make destructive actions reversible.
 
-Keep the final review bounded: one reviewer, a respected user-chosen model, no forced Sol/council or automatic fan-out. Record findings with evidence, severity and disposition; make scoped fixes, rerun affected checks, and stop at optional nits. See `../../references/verification-and-review.md`.
+Keep independent review optional and bounded: one reviewer, at most two reviewer runs per task. Reuse the user's model choice; otherwise ask once and suggest GPT-6.1 Sol at low effort. Confirm availability and never silently substitute. Record findings with evidence, severity and disposition; make scoped fixes, rerun affected checks, and stop at optional nits. Follow `../../references/verification-and-review.md` for review inputs, limits and unresolved findings.
 
 ## Scenario verification (T06)
 
