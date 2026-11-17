@@ -17,7 +17,7 @@ Record, without mutating:
 - User/project/model preferences and authorization boundaries.
 - Whether local reporting is enabled in project instructions or requested for this task.
 
-Before implementation, identify the acceptance evidence needed to demonstrate the requested behavior. Before delivery, perform proportionate final behavior verification and a separate code review pass; disclose unavailable evidence and limitations. Label same-agent review honestly.
+Before implementation, identify the acceptance evidence needed to demonstrate the requested behavior. Before delivery, perform proportionate final behavior verification and a separate code review pass; disclose unavailable evidence and limitations. Label same-agent review honestly. When a check fails, reproduce and localize it, classify product vs environment vs fixture failure, and keep the regression proof focused; see `../../references/verification-and-review.md`.
 
 Read-only requests must produce no edits, commits, publication, push, merge, or deployment.
 
@@ -61,6 +61,7 @@ Examples are snapshots, not guarantees: Matt implement may commit; Matt to-spec 
 
 - Preserve dirty/unrelated changes; never revert or overwrite them.
 - Do not perform broad cleanup, migrations, dependency adoption, or production operations outside authorization.
+- Reuse existing code and guidance before adding machinery. When simplifying, limit edits to what you touched, preserve observable behavior and verify it is unchanged; unrelated cleanup stays optional, not required.
 - Disclose unavailable tools and unverified steps.
 - Respect user preferences, task-specific model choices, and project instructions.
 

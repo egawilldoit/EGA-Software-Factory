@@ -32,6 +32,23 @@ For each essential criterion report `passed`, `failed`, or `not checked` with co
 - Missing essential evidence affects readiness; do not claim full verification when mandatory evidence is missing.
 - Green checks do not authorize production operations or make deletion reversible.
 
+## Failure diagnosis
+
+When a check fails, diagnose before changing code so the fix targets the cause rather than the symptom.
+
+- **Reproduce:** capture the exact command, input and environment, reduce to a minimal repeatable case, and confirm the failure before editing where practical. If reproduction is unavailable or would require unauthorized access, state the gap and distinguish the diagnosis from an observed result.
+- **Localize:** narrow to the smallest step or component that flips the result from failing to passing; inspect actual output, not only the narrative.
+- **Classify:** decide whether the failure is in the product, the environment (host, dependencies, permissions, version drift, network) or the fixture/mock/harness. State the classification and why. An environment or fixture defect is not a product bug, and masking one layer's cause in another hides the real problem.
+- **Fix the cause, then prove it narrowly:** keep or add the smallest check that fails before the fix and passes after under the same input and environment. A passing build or static scan alone is not that proof.
+- Record anything still unknown and its readiness impact. Do not turn one reproduced failure into a blanket rule without the recurrence checks in `improvement-and-metrics.md`.
+
+## Tests as evidence
+
+- A useful test demonstrates observable behavior and would have failed on the original bug; a test that only restates the implementation it calls proves little.
+- Prefer one focused regression test for the original failure over broad, duplicated coverage. Add a test only when it checks a distinct behavior or failure path that existing coverage does not.
+- Distinguish a proposed or added test from an executed one: run it and record the before/after result when it serves as the regression proof above.
+- Choose checks from the actual risk (the check areas above), not a mandatory unit/integration/E2E stack.
+
 ## Completion and blockers
 
 Identify the essential checks for this scope and why they are needed. Separate user/project requirements and checks justified by concrete risks from optional improvements. Do not present every possible coverage gap as a blocker.
@@ -42,7 +59,7 @@ If blocked, focus on resolving the blocker through permitted alternatives. Do no
 
 ## Separate review
 
-Review separately from verification: requested behavior, omitted requirements, unintended changes, error handling, security, architecture, maintainability, and test coverage. Report limitations honestly and disclose review independence. Same-agent review is labeled `same-agent` and is not independent.
+Review separately from verification: requested behavior, omitted requirements, unintended changes, error handling, security, architecture, maintainability, and test coverage. Ground findings in the relevant callers, contracts and failure paths you actually inspected: cite concrete evidence (file, line, command output or observed behavior) and state impact and reachability. Keep the review inside the requested scope; do not expand it on speculative risks without evidence, decline unsupported suggestions with a reason under Bounded review. Report limitations honestly and disclose review independence. Same-agent review is labeled `same-agent` and is not independent.
 
 ## Bounded review
 
